@@ -14,12 +14,10 @@ export function AppRoutes() {
       <Toaster />
       <Router
         main={
-          <Route path="/" element={<Layout />}>
-
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/docs" element={<Docs />} />
-
+          <Route element={<Layout />} path="/">
+            <Route element={<Home />} path="/" />
+            <Route element={<Login />} path="/login" />
+            <Route element={<Docs />} path="/docs" />
           </Route>
         }
       />

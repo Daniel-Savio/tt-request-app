@@ -26,13 +26,13 @@ export interface AppData {
 }
 
 export interface DataInfo {
-  comercial: string[],
-  processamento: string[],
-  sd: string[],
-  entradas: string[],
-  protocolos_entrada: string[],
-  protocolos_saida: string[],
-  ied: string[],
+  comercial: string[]
+  processamento: string[]
+  sd: string[]
+  entradas: string[]
+  protocolos_entrada: string[]
+  protocolos_saida: string[]
+  ied: string[]
   ied_terceiros: IedTerceiros[]
 }
 
@@ -42,20 +42,28 @@ export interface IedTerceiros {
 }
 
 export const requestFormSchema = z.object({
-  salesName: z.string("Insira um nome válido e envie novamente").min(3, "Insira um nome válido").nonempty("Campo obrigatório"),
-  processName: z.string("Insira um nome válido e envie novamente").min(3, "Insira um nome válido").nonempty("Campo obrigatório"),
+  salesName: z
+    .string('Insira um nome válido e envie novamente')
+    .min(3, 'Insira um nome válido')
+    .nonempty('Campo obrigatório'),
+  processName: z
+    .string('Insira um nome válido e envie novamente')
+    .min(3, 'Insira um nome válido')
+    .nonempty('Campo obrigatório'),
   email: z.email(),
-  client: z.string().min(3, "Insira um nome válido"),
-  project: z.string().min(3, "Insira um nome válido"),
-  invoiceNumber: z.string().regex(/^\d+$/, "Insira um número de pedido válido"),
-  clientNumber: z.string().regex(/^\d+$/, "Insira um número de cliente válido"),
-  processingDate: z.date("Selecione uma data válida"),
-  input: z.array(z.object({
-    protocol: z.string(),
-    type: z.string(),
-
-  })).optional()
-
+  client: z.string().min(3, 'Insira um nome válido'),
+  project: z.string().min(3, 'Insira um nome válido'),
+  invoiceNumber: z.string().regex(/^\d+$/, 'Insira um número de pedido válido'),
+  clientNumber: z.string().regex(/^\d+$/, 'Insira um número de cliente válido'),
+  processingDate: z.date('Selecione uma data válida'),
+  entradas: z
+    .array(
+      z.object({
+        type: z.string(),
+        value: z.string(),
+      })
+    )
+    .optional(),
 })
 
 export type RequestForm = z.infer<typeof requestFormSchema>

@@ -10,10 +10,10 @@ export const PLATFORM = {
 
 export const IPC = {
   GITSTATUS: {
-    PULL: "git-status: pull",
-    CLONE: "git-status: clone",
+    PULL: 'git-status: pull',
+    CLONE: 'git-status: clone',
   },
   JSON: {
-    FETCH: "app-data: fetch",
-  }
+    FETCH: 'app-data: fetch',
+  },
 }

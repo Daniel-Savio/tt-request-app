@@ -8,8 +8,6 @@ import './globals.css'
 
 ReactDom.createRoot(document.querySelector('app') as HTMLElement).render(
   <QueryClientProvider client={queryClient}>
-
     <AppRoutes />
   </QueryClientProvider>
-
 )

@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { IPC } from 'shared/constants'
-import { AppData, StatusResponse, } from 'shared/types'
+import type { AppData, StatusResponse } from 'shared/types'
 
 declare global {
   interface Window {
@@ -19,7 +19,7 @@ const API = {
   },
   getJsonData(): Promise<AppData> {
     return ipcRenderer.invoke(IPC.JSON.FETCH)
-  }
+  },
 }
 
 contextBridge.exposeInMainWorld('App', API)
