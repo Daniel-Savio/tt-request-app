@@ -68,6 +68,10 @@ export const requestFormSchema = z.object({
         dataBits: z.string().optional(),
         parity: z.string().optional(),
         stopBits: z.string().optional(),
+        ieds: z.array(z.object({
+          name: z.string(),
+          address: z.string(),
+        })).optional(),
       })
     )
     .optional(),
