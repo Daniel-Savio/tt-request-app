@@ -56,11 +56,18 @@ export const requestFormSchema = z.object({
   invoiceNumber: z.string().regex(/^\d+$/, 'Insira um número de pedido válido'),
   clientNumber: z.string().regex(/^\d+$/, 'Insira um número de cliente válido'),
   processingDate: z.date('Selecione uma data válida'),
-  entradas: z
+    entradas: z
     .array(
       z.object({
         type: z.string(),
         value: z.string(),
+        ip: z.string().optional(),
+        port: z.string().optional(),
+        config: z.string().optional(),
+        baudRate: z.string().optional(),
+        dataBits: z.string().optional(),
+        parity: z.string().optional(),
+        stopBits: z.string().optional(),
       })
     )
     .optional(),

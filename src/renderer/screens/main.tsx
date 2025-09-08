@@ -1,53 +1,57 @@
-import { Button } from '../components/ui/button'
-import { Calendar } from '../components/ui/calendar'
-import { Label } from '../components/ui/label'
+import { Button } from "../components/ui/button";
+import { Calendar } from "../components/ui/calendar";
+import { Label } from "../components/ui/label";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '../components/ui/popover'
+} from "../components/ui/popover";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../components/ui/select'
-import { Separator } from '../components/ui/separator'
+} from "../components/ui/select";
+import { Separator } from "../components/ui/separator";
 import {
   ChevronDownIcon,
   ChevronLeft,
   ChevronRight,
+  CirclePlus,
   Github,
-} from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { useForm, useFieldArray } from 'react-hook-form'
-import { ScrollArea } from '../components/ui/scroll-area'
-import { type RequestForm, requestFormSchema } from '../../shared/types'
-import { toast } from 'sonner'
-import { useQuery } from '@tanstack/react-query'
-import { Input } from '../components/ui/input'
-import { zodResolver } from '@hookform/resolvers/zod'
+  Plus,
+  Trash,
+} from "lucide-react";
+import { useEffect, useId, useState } from "react";
+import { useForm, useFieldArray } from "react-hook-form";
+import { ScrollArea } from "../components/ui/scroll-area";
+import { type RequestForm, requestFormSchema } from "../../shared/types";
+import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
+import { Input } from "../components/ui/input";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export function Home() {
+  const id = useId();
   //Date-Picker
-  const [open, setOpen] = useState(false)
-  const [date, setDate] = useState<Date | undefined>(undefined)
-  const [formStep, setFormStep] = useState(0)
+  const [open, setOpen] = useState(false);
+  const [date, setDate] = useState<Date | undefined>(undefined);
+  const [formStep, setFormStep] = useState(0);
 
   function nextStep() {
-    setFormStep(formStep + 1)
+    setFormStep(formStep + 1);
   }
   function previousStep() {
-    setFormStep(formStep - 1)
+    setFormStep(formStep - 1);
   }
 
   //Use quary
   const { data } = useQuery({
-    queryKey: ['getJsonData'],
+    queryKey: ["getJsonData"],
     queryFn: async () => {
-      const status = await window.App.cloneGitStatus()
-      toast('Notificação', {
+      const status = await window.App.cloneGitStatus();
+      toast("Notificação", {
         description: status.message,
         invert: true,
         richColors: true,
@@ -57,12 +61,12 @@ export function Home() {
         ) : (
           <Github className="text-red-600 size-4" />
         ),
-      })
+      });
 
-      const response = await window.App.getJsonData()
-      return response.data
+      const response = await window.App.getJsonData();
+      return response.data;
     },
-  })
+  });
 
   //Formulario
   const {
@@ -72,22 +76,22 @@ export function Home() {
     watch,
     control,
     formState: { errors },
-  } = useForm({ resolver: zodResolver(requestFormSchema) })
+  } = useForm({ resolver: zodResolver(requestFormSchema) });
 
   const { fields, append, remove } = useFieldArray({
     control,
-    name: 'entradas',
-  })
+    name: "entradas",
+  });
 
-  const invoiceNumber = watch('invoiceNumber')
-  const clientNumber = watch('clientNumber')
+  const invoiceNumber = watch("invoiceNumber");
+  const clientNumber = watch("clientNumber");
 
   useEffect(() => {
     if (invoiceNumber) {
-      setValue('invoiceNumber', invoiceNumber.replace(/\D/g, ''))
+      setValue("invoiceNumber", invoiceNumber.replace(/\D/g, ""));
     }
     if (clientNumber) {
-      setValue('clientNumber', clientNumber.replace(/\D/g, ''))
+      setValue("clientNumber", clientNumber.replace(/\D/g, ""));
     }
     if (
       errors.client ||
@@ -99,19 +103,19 @@ export function Home() {
       errors.salesName ||
       errors.processingDate
     ) {
-      setFormStep(0)
+      setFormStep(0);
     }
-  }, [invoiceNumber, setValue, clientNumber, setValue, errors])
+  }, [invoiceNumber, setValue, clientNumber, setValue, errors]);
 
   function postForm(data: RequestForm) {
-    toast('Info', {
+    toast("Info", {
       description: (
         <pre className="text-wrap overflow-auto">{JSON.stringify(data)}</pre>
       ),
       invert: true,
       richColors: true,
       duration: 2000,
-    })
+    });
   }
 
   return (
@@ -121,7 +125,9 @@ export function Home() {
 
         <form className="" onSubmit={handleSubmit(postForm)}>
           <section
-            className={` ${formStep === 0 ? '' : 'hidden'} p-2 mb-4 rounded grid grid-cols-1 md:grid-cols-2 gap-4 shadow-md `}
+            className={` ${
+              formStep === 0 ? "" : "hidden"
+            } p-2 mb-4 rounded grid grid-cols-1 md:grid-cols-2 gap-4 shadow-md `}
           >
             <div>
               <Label
@@ -133,20 +139,20 @@ export function Home() {
 
               <Select
                 defaultValue=""
-                onValueChange={value => {
-                  setValue('salesName', value)
+                onValueChange={(value) => {
+                  setValue("salesName", value);
                 }}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Jhon Doe" />
                 </SelectTrigger>
                 <SelectContent>
-                  {data?.comercial.map(comercial => {
+                  {data?.comercial.map((comercial) => {
                     return (
                       <SelectItem key={comercial} value={comercial}>
                         {comercial}
                       </SelectItem>
-                    )
+                    );
                   })}
                 </SelectContent>
               </Select>
@@ -167,20 +173,20 @@ export function Home() {
 
               <Select
                 defaultValue=""
-                onValueChange={value => {
-                  setValue('processName', value)
+                onValueChange={(value) => {
+                  setValue("processName", value);
                 }}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Jane Doe" />
                 </SelectTrigger>
                 <SelectContent>
-                  {data?.processamento.map(processamento => {
+                  {data?.processamento.map((processamento) => {
                     return (
                       <SelectItem key={processamento} value={processamento}>
                         {processamento}
                       </SelectItem>
-                    )
+                    );
                   })}
                 </SelectContent>
               </Select>
@@ -196,14 +202,14 @@ export function Home() {
                 E-mail
               </Label>
               <Input
-                id="email"
+                id={`${id}-email`}
                 placeholder="jhondoe@treetech.com.br"
                 type="email"
-                {...register('email', {
-                  required: 'Campo obrigatório',
+                {...register("email", {
+                  required: "Campo obrigatório",
                   pattern: {
                     value: /\S+@\S+\.\S+/,
-                    message: 'E-mail inválido',
+                    message: "E-mail inválido",
                   },
                 })}
                 className=""
@@ -219,9 +225,9 @@ export function Home() {
                 Cliente
               </Label>
               <Input
-                id="client"
+                id={`${id}-client`}
                 placeholder="PSI"
-                {...register('client')}
+                {...register("client")}
                 className=""
               />
               {errors.client && (
@@ -235,9 +241,9 @@ export function Home() {
                 Projeto
               </Label>
               <Input
-                id="projeto"
+                id={`${id}-projeto`}
                 placeholder="ISA ENERGIA"
-                {...register('project')}
+                {...register("project")}
                 className=""
               />
               {errors.project && (
@@ -251,10 +257,10 @@ export function Home() {
                 Nº Pedido
               </Label>
               <Input
-                id="numeroPedido"
+                id={`${id}-numeroPedido`}
                 placeholder="54321"
                 type="text"
-                {...register('invoiceNumber')}
+                {...register("invoiceNumber")}
                 className=""
               />
               {errors.invoiceNumber && (
@@ -268,10 +274,10 @@ export function Home() {
                 Nº Cliente
               </Label>
               <Input
-                id="clientNumber"
+                id={`${id}-clientNumber`}
                 placeholder="12345"
                 type="text"
-                {...register('clientNumber')}
+                {...register("clientNumber")}
                 className=""
               />
               {errors.clientNumber && (
@@ -288,10 +294,10 @@ export function Home() {
                 <PopoverTrigger asChild>
                   <Button
                     className="w-full mt-1 justify-between font-normal"
-                    id="date"
+                    id={`${id}-date`}
                     variant="outline"
                   >
-                    {date ? date.toLocaleDateString() : 'Escolha a data'}
+                    {date ? date.toLocaleDateString() : "Escolha a data"}
                     <ChevronDownIcon />
                   </Button>
                 </PopoverTrigger>
@@ -302,9 +308,11 @@ export function Home() {
                   <Calendar
                     captionLayout="dropdown"
                     mode="single"
-                    onSelect={date => {
-                      setDate(date)
-                      setValue('processingDate', date!)
+                    onSelect={(date) => {
+                      setDate(date);
+                      if (date) {
+                        setValue("processingDate", date);
+                      }
                     }}
                     selected={date}
                   />
@@ -320,64 +328,190 @@ export function Home() {
 
           {/* STEP 2 */}
           <section
-            className={` ${formStep === 1 ? '' : 'hidden'}  p-2 mb-4 rounded gap-4 shadow-md `}
+            className={` ${
+              formStep === 1 ? "" : "hidden"
+            }  p-2 mb-4 rounded gap-4 shadow-md `}
           >
             <div>
-
               <Label className=" text-sm font-medium ">Gateway</Label>
               <Select>
-
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Selecione um IED" />
                 </SelectTrigger>
                 <SelectContent>
-                  {data?.sd.map(sd => {
+                  {data?.sd.map((sd) => {
                     return (
                       <SelectItem key={sd} value={sd}>
                         {sd}
                       </SelectItem>
-                    )
+                    );
                   })}
                 </SelectContent>
               </Select>
             </div>
 
             <ScrollArea className="max-h-400 mt-4 w-full">
-              <Button
-                className="mt-2"
-                onClick={() => append({ type: '', value: '' })}
-                type="button"
-              >
-                Adicionar Entrada
-              </Button>
-              {fields.map((field, index) => (
-                <div className="flex flex-col gap-2 ml-6 mt-4" key={field.id}>
-                  <Button onClick={() => remove(index)} type="button" variant={'destructive'} className='w-fit'>
-                    Remover Entrada
-                  </Button>
-                  <Select
-                    onValueChange={value =>
-                      setValue(`entradas.${index}.type`, value)
-                    }
-                  >
-                    <SelectTrigger className='w-full'>
-                      <SelectValue placeholder="Selecione o tipo" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {data?.entradas.map(entrada => (
-                        <SelectItem key={entrada} value={entrada}>
-                          {entrada}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+              <h1 className="text-lg font-bold">
+                Entradas{" "}
+                <Button
+                  className="mt-2"
+                  onClick={() => append({ type: "", value: "" })}
+                  type="button"
+                >
+                  <Plus />
+                </Button>
+              </h1>
 
+              {fields.map((field, index) => {
+                const entradaType = watch(`entradas.${index}.type`);
+                return (
+                  <div className="flex flex-col gap-2 ml-6 mt-4" key={field.id}>
+                    <h1 className="text-lg flex gap-2 items-center font-bold">
+                      {index + 1}-) Entrada
+                      <Button
+                        onClick={() => remove(index)}
+                        type="button"
+                        variant={"destructive"}
+                        className="w-fit"
+                      >
+                        <Trash />
+                      </Button>
+                    </h1>
 
-                </div>
-              ))}
+                    <Label>Protocolo</Label>
 
+                    <Select>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Selecione o protocolo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {data?.protocolos_entrada.map((protocolo) => (
+                          <SelectItem key={protocolo} value={protocolo}>
+                            {protocolo}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    <Select
+                      onValueChange={(value) =>
+                        setValue(`entradas.${index}.type`, value)
+                      }
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Selecione o tipo da entrada" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {data?.entradas.map((entrada) => (
+                          <SelectItem key={entrada} value={entrada}>
+                            {entrada}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    {entradaType === "TCP/IP" && (
+                      <>
+                        <Label className="mt-2">Parâmetros de rede</Label>
+                        <Input
+                          placeholder="IP"
+                          {...register(`entradas.${index}.ip`)}
+                        />
+                        <Input
+                          placeholder="Port"
+                          {...register(`entradas.${index}.port`)}
+                        />
+                      </>
+                    )}
+
+                    {entradaType && entradaType !== "TCP/IP" && (
+                      <>
+                        <Label className="mt-2">Parâmetros de rede</Label>
+
+                        <Select
+                          onValueChange={(value) =>
+                            setValue(`entradas.${index}.baudRate`, value)
+                          }
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Baudrate" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem key={1} value={"9600"}>
+                              9600
+                            </SelectItem>
+                            <SelectItem key={2} value={"19200"}>
+                              19200
+                            </SelectItem>
+                            <SelectItem key={3} value={"115200"}>
+                              115200
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+
+                        <Select
+                          onValueChange={(value) =>
+                            setValue(`entradas.${index}.dataBits`, value)
+                          }
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Bits de dados" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem key={1} value={"8"}>
+                              8
+                            </SelectItem>
+                            <SelectItem key={2} value={"7"}>
+                              7
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+
+                        <Select
+                          onValueChange={(value) =>
+                            setValue(`entradas.${index}.parity`, value)
+                          }
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Paridade" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem key={1} value={"None"}>
+                              None - Nenhuma
+                            </SelectItem>
+                            <SelectItem key={2} value={"Odd"}>
+                              Odd - ímpar
+                            </SelectItem>
+                            <SelectItem key={3} value={"Even"}>
+                              Even - Par
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+
+                        <Select
+                          onValueChange={(value) =>
+                            setValue(`entradas.${index}.stopBits`, value)
+                          }
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Bit de parada" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem key={1} value={"1"}>
+                              1
+                            </SelectItem>
+                            <SelectItem key={2} value={"2"}>
+                              2
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </>
+                    )}
+                    <Separator></Separator>
+                  </div>
+                );
+              })}
             </ScrollArea>
-
           </section>
 
           <Separator></Separator>
@@ -388,7 +522,7 @@ export function Home() {
               disabled={formStep === 0}
               onClick={previousStep}
               type="button"
-              variant={'secondary'}
+              variant={"secondary"}
             >
               <ChevronLeft />
               Anterior
@@ -400,7 +534,7 @@ export function Home() {
               disabled={formStep === 2}
               onClick={nextStep}
               type="button"
-              variant={'secondary'}
+              variant={"secondary"}
             >
               Próximo
               <ChevronRight />
@@ -409,16 +543,16 @@ export function Home() {
           </div>
 
           <div
-            className={`  mt-8 md:col-span-2 flex justify-end ${formStep === 2 ? '' : 'hidden'}`}
+            className={`  mt-8 md:col-span-2 flex justify-end ${
+              formStep === 2 ? "" : "hidden"
+            }`}
           >
             <Button className="w-full" type="submit">
               Enviar
             </Button>
           </div>
-
-
         </form>
       </ScrollArea>
     </div>
-  )
+  );
 }
