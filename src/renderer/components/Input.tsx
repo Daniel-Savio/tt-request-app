@@ -1,17 +1,62 @@
 import { useFieldArray, useFormContext } from "react-hook-form";
+import { useEffect } from "react";
 import { Button } from "./ui/button";
-import { Trash } from "lucide-react";
+import { CircleQuestionMark, FileQuestionMark, Trash } from "lucide-react";
 import { Label } from "./ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Input } from "./ui/input";
 import { Separator } from "./ui/separator";
 import { IedSidebar } from "./IedSidebar";
 import { IedList } from "./IedList";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 export function Entrada({ index, remove, data }: { index: number, remove: (index: number) => void, data: any }) {
   const { control, register, watch, setValue } = useFormContext();
   const entradaType = watch(`entradas.${index}.type`);
   const ieds = watch(`entradas.${index}.ieds`);
+  const allEntradas = watch(`entradas`);
+  const baudRate = watch(`entradas.${index}.baudRate`);
+  const dataBits = watch(`entradas.${index}.dataBits`);
+  const parity = watch(`entradas.${index}.parity`);
+  const stopBits = watch(`entradas.${index}.stopBits`);
+
+  useEffect(() => {
+    if (!baudRate) {
+      setValue(`entradas.${index}.baudRate`, "9600");
+    }
+    if (!dataBits) {
+      setValue(`entradas.${index}.dataBits`, "8");
+    }
+    if (!parity) {
+      setValue(`entradas.${index}.parity`, "None");
+    }
+    if (!stopBits) {
+      setValue(`entradas.${index}.stopBits`, "1");
+    }
+  }, [baudRate, dataBits, parity, stopBits, index, setValue]);
+
+  const filteredEntradas = data?.entradas.filter((entrada: string) => {
+    const isAlreadySelected = allEntradas.some((e: any, i: number) => i !== index && e.type === entrada);
+
+    if (isAlreadySelected && (entrada === "71-72" || entrada === "74-75")) {
+      return false;
+    }
+
+    const is7172Selected = allEntradas.some((e: any, i: number) => i !== index && e.type === "71-72");
+    const is7475Selected = allEntradas.some((e: any, i: number) => i !== index && e.type === "74-75");
+    const is717273Selected = allEntradas.some((e: any, i: number) => i !== index && e.type === "71-72-73");
+
+    if (entrada === "71-72-73" && (is7172Selected || is7475Selected)) {
+      return false;
+    }
+
+    if ((entrada === "71-72" || entrada === "74-75") && is717273Selected) {
+      return false;
+    }
+
+    return true;
+  });
+
 
   const { append: appendIed, remove: removeIed } = useFieldArray({
     control,
@@ -26,7 +71,7 @@ export function Entrada({ index, remove, data }: { index: number, remove: (index
           onClick={() => remove(index)}
           type="button"
           variant={"ghost"}
-          className="w-fit border size-6 border-destructive rounded-full"
+          className="w-fit border size-6 "
         >
           <Trash className="text-destructive" />
         </Button>
@@ -34,7 +79,10 @@ export function Entrada({ index, remove, data }: { index: number, remove: (index
 
       <Label>Protocolo</Label>
 
-      <Select>
+      <Select
+        onValueChange={(value) =>
+          setValue(`entradas.${index}.protocolo`, value)
+        }>
         <SelectTrigger className="w-full">
           <SelectValue placeholder="Selecione o protocolo" />
         </SelectTrigger>
@@ -56,7 +104,7 @@ export function Entrada({ index, remove, data }: { index: number, remove: (index
           <SelectValue placeholder="Selecione o tipo da entrada" />
         </SelectTrigger>
         <SelectContent>
-          {data?.entradas.map((entrada: string) => (
+          {filteredEntradas.map((entrada: string) => (
             <SelectItem key={entrada} value={entrada}>
               {entrada}
             </SelectItem>
@@ -64,9 +112,36 @@ export function Entrada({ index, remove, data }: { index: number, remove: (index
         </SelectContent>
       </Select>
 
+
+      <Label className="mt-2 flex">
+        <p>Parâmetros de rede</p>
+        {entradaType && entradaType !== "TCP/IP" && (
+          <Tooltip>
+            <TooltipTrigger><CircleQuestionMark className="size-4" /></TooltipTrigger>
+            <TooltipContent>
+              <pre>
+                Parâmetros de rede serial
+                <br />
+                Baudrate, Bit de dados, Paridade e Bit de parada
+              </pre>
+            </TooltipContent>
+          </Tooltip>
+        )}
+        {entradaType && entradaType === "TCP/IP" && (
+          <Tooltip>
+            <TooltipTrigger><CircleQuestionMark className="size-4" /></TooltipTrigger>
+            <TooltipContent>
+              <pre>
+                Parâmetros de rede Ethernet
+                <br />
+                IP do ied a ser lido e Porta TCP da comunicação
+              </pre>
+            </TooltipContent>
+          </Tooltip>
+        )}
+      </Label>
       {entradaType === "TCP/IP" && (
-        <>
-          <Label className="mt-2">Parâmetros de rede</Label>
+        <div className="flex gap-2">
           <Input
             placeholder="IP"
             {...register(`entradas.${index}.ip`)}
@@ -75,14 +150,14 @@ export function Entrada({ index, remove, data }: { index: number, remove: (index
             placeholder="Port"
             {...register(`entradas.${index}.port`)}
           />
-        </>
+        </div>
       )}
 
       {entradaType && entradaType !== "TCP/IP" && (
-        <>
-          <Label className="mt-2">Parâmetros de rede</Label>
-
+        <div className="flex gap-2">
           <Select
+            defaultValue="9600"
+            value={baudRate}
             onValueChange={(value) =>
               setValue(`entradas.${index}.baudRate`, value)
             }
@@ -104,6 +179,8 @@ export function Entrada({ index, remove, data }: { index: number, remove: (index
           </Select>
 
           <Select
+            defaultValue="8"
+            value={dataBits}
             onValueChange={(value) =>
               setValue(`entradas.${index}.dataBits`, value)
             }
@@ -122,6 +199,8 @@ export function Entrada({ index, remove, data }: { index: number, remove: (index
           </Select>
 
           <Select
+            defaultValue={"None"}
+            value={parity}
             onValueChange={(value) =>
               setValue(`entradas.${index}.parity`, value)
             }
@@ -131,18 +210,20 @@ export function Entrada({ index, remove, data }: { index: number, remove: (index
             </SelectTrigger>
             <SelectContent>
               <SelectItem key={1} value={"None"}>
-                None - Nenhuma
+                None
               </SelectItem>
               <SelectItem key={2} value={"Odd"}>
-                Odd - ímpar
+                Odd
               </SelectItem>
               <SelectItem key={3} value={"Even"}>
-                Even - Par
+                Even
               </SelectItem>
             </SelectContent>
           </Select>
 
           <Select
+            defaultValue="1"
+            value={stopBits}
             onValueChange={(value) =>
               setValue(`entradas.${index}.stopBits`, value)
             }
@@ -159,17 +240,17 @@ export function Entrada({ index, remove, data }: { index: number, remove: (index
               </SelectItem>
             </SelectContent>
           </Select>
-        </>
+        </div>
       )}
-      
+
       <Separator />
       <IedSidebar
         ieds={data?.ied || []}
         ieds_terceiros={data?.ied_terceiros || []}
         onAddIed={appendIed}
       />
-      <IedList entradaIndex={index} ieds={ieds} onRemoveIed={removeIed} />
-      
+      <IedList fieldName="entradas" entradaIndex={index} ieds={ieds} onRemoveIed={removeIed} />
+
     </div>
   );
 }

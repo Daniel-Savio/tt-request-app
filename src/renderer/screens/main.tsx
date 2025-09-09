@@ -19,12 +19,14 @@ import {
   ChevronLeft,
   ChevronRight,
   CirclePlus,
+  FileWarning,
   Github,
   Plus,
   Trash,
 } from "lucide-react";
 import { useEffect, useId, useState } from "react";
-import { Entrada } from "../components/Entrada";
+import { Entrada } from "../components/Input";
+import { Output } from "../components/Output";
 import { FormProvider, useForm, useFieldArray } from "react-hook-form";
 import { ScrollArea } from "../components/ui/scroll-area";
 import { type RequestForm, requestFormSchema } from "../../shared/types";
@@ -32,6 +34,7 @@ import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "../components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Tiptap from "renderer/components/TipTap";
 
 export function Home() {
   const id = useId();
@@ -70,7 +73,12 @@ export function Home() {
   });
 
   //Formulario
-  const methods = useForm({ resolver: zodResolver(requestFormSchema) });
+  const methods = useForm({
+    resolver: zodResolver(requestFormSchema),
+    defaultValues: {
+      sigmaConnection: "Com Comunicação",
+    },
+  });
   const {
     register,
     handleSubmit,
@@ -80,9 +88,18 @@ export function Home() {
     formState: { errors },
   } = methods;
 
-  const { fields, append, remove } = useFieldArray({
+  const allEntradas = watch("entradas");
+  const selectedIedsFromInput = Array.from(new Map(allEntradas?.flatMap(e => e.ieds).filter(Boolean).map((ied: any) => [ied.name, ied])).values());
+
+
+  const { fields: entradaFields, append: appendEntrada, remove: removeEntrada } = useFieldArray({
     control,
     name: "entradas",
+  });
+
+  const { fields: saidaFields, append: appendSaida, remove: removeSaida } = useFieldArray({
+    control,
+    name: "saidas",
   });
 
   const invoiceNumber = watch("invoiceNumber");
@@ -107,9 +124,31 @@ export function Home() {
     ) {
       setFormStep(0);
     }
+    if (errors.entradas) setFormStep(1);
+    if (errors.sigmaConnection) setFormStep(2);
+    if (errors.saidas) setFormStep(3);
+
+    setValue("sigmaConnection", "Com Comunicação")
+
   }, [invoiceNumber, setValue, clientNumber, setValue, errors]);
 
   function postForm(data: RequestForm) {
+    console.log(data)
+
+    if (data.saidas.length === 0) {
+      toast("Erro", {
+        description: (
+          <p className="text-wrap overflow-auto">Inclua ao menos uma saída</p>
+        ),
+        invert: true,
+        richColors: true,
+        duration: 2000,
+        icon: <FileWarning className="text-destructive size-4" />,
+      });
+      return
+    }
+
+
     toast("Info", {
       description: (
         <pre className="text-wrap overflow-auto">{JSON.stringify(data)}</pre>
@@ -122,15 +161,14 @@ export function Home() {
 
   return (
     <div className="flex flex-col items-center justify-center ">
-      <ScrollArea className="w-full h-[800px] p-4 rounded-lg">
+      <ScrollArea className="w-full h-[900px] p-4 rounded-lg">
         <h1 className="text-2xl font-bold mb-4 ">Formulário de Requisição</h1>
 
         <FormProvider {...methods}>
           <form className="" onSubmit={handleSubmit(postForm)}>
             <section
-              className={` ${
-                formStep === 0 ? "" : "hidden"
-              } p-2 mb-4 rounded grid grid-cols-1 md:grid-cols-2 gap-4 shadow-md `}
+              className={` ${formStep === 0 ? "" : "hidden"
+                } p-2 mb-4 rounded grid grid-cols-1 md:grid-cols-2 gap-4 shadow-md `}
             >
               <div>
                 <Label
@@ -331,9 +369,8 @@ export function Home() {
 
             {/* STEP 2 */}
             <section
-              className={` ${
-                formStep === 1 ? "" : "hidden"
-              }  p-2 mb-4 rounded gap-4 shadow-md `}
+              className={` ${formStep === 1 ? "" : "hidden"
+                }  p-2 mb-4 rounded gap-4 shadow-md `}
             >
               <div>
                 <Label className=" text-sm font-medium ">Gateway</Label>
@@ -353,12 +390,12 @@ export function Home() {
                 </Select>
               </div>
 
-              <ScrollArea className="max-h-400 mt-4 w-full">
+              <ScrollArea className="max-h-900 mt-4 w-full">
                 <h1 className="text-lg font-bold">
                   Entradas{" "}
                   <Button
-                    className="mt-2 border border-primary size-6 rounded-full"
-                    onClick={() => append({ type: "", value: "" })}
+                    className="mt-2 border  size-6 "
+                    onClick={() => appendEntrada({ type: "", protocolo: "", baudRate: "9600", dataBits: "8", parity: "None", stopBits: "1" })}
                     type="button"
                     variant="ghost"
                   >
@@ -366,15 +403,108 @@ export function Home() {
                   </Button>
                 </h1>
 
-                {fields.map((field, index) => (
+                {entradaFields.map((field, index) => (
                   <Entrada
                     key={field.id}
                     index={index}
-                    remove={remove}
+                    remove={removeEntrada}
                     data={data}
                   />
                 ))}
               </ScrollArea>
+            </section>
+
+            {/* STEP 3 */}
+            <section
+              className={` ${formStep === 2 ? "" : "hidden"
+                }  p-2 mb-4 rounded gap-4 shadow-md `}
+            >
+              <div>
+                <Label
+                  className=" text-sm font-medium "
+                  htmlFor="responsavelComercial"
+                >
+                  Comunicação com o Sigma
+                </Label>
+
+                <Select
+                  defaultValue="Com Comunicação"
+                  onValueChange={(value) => {
+                    setValue("sigmaConnection", value);
+                  }}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Tipo da comunicação" />
+
+                  </SelectTrigger>
+                  <SelectContent>
+
+                    <SelectItem key={1} value={"Sem Comunicação"}>
+                      Sem Comunicação
+                    </SelectItem>
+                    <SelectItem key={2} value={"Com Comunicação"}>
+                      Com Comunicação
+                    </SelectItem>
+                    <SelectItem key={3} value={"SigmaSync"}>
+                      Sigma Sync
+                    </SelectItem>
+
+                  </SelectContent>
+                </Select>
+
+                {errors.sigmaConnection && (
+                  <p className="mt-2 text-sm text-destructive">
+                    {errors.sigmaConnection.message}
+                  </p>
+                )}
+              </div>
+
+            </section>
+
+            {/* STEP 4 */}
+            <section
+              className={` ${formStep === 3 ? "" : "hidden"
+                }  p-2 mb-4 rounded gap-4 shadow-md `}
+            >
+              <ScrollArea className="max-h-900 mt-4 w-full">
+                <h1 className="text-lg font-bold">
+                  Saídas{" "}
+                  <Button
+                    className="mt-2 border  size-6 "
+                    onClick={() => {
+                      const firstInput = methods.getValues("entradas.0");
+                      appendSaida({
+                        type: "TCP/IP",
+                        protocolo: firstInput?.protocolo,
+                        ieds: firstInput?.ieds,
+                        baudRate: "9600",
+                        dataBits: "8",
+                        parity: "None",
+                        stopBits: "1",
+                      });
+                    }}
+                    type="button"
+                    variant="ghost"
+                  >
+                    <Plus className="text-primary" />
+                  </Button>
+                </h1>
+
+                {saidaFields.map((field, index) => (
+                  <Output
+                    key={field.id}
+                    index={index}
+                    remove={removeSaida}
+                    data={data}
+                    selectedIedsFromInput={selectedIedsFromInput}
+                  />
+                ))}
+              </ScrollArea>
+              <div className="mt-4">
+
+                <Tiptap name="comments"></Tiptap>
+              </div>
+
             </section>
 
             <Separator></Separator>
@@ -391,10 +521,10 @@ export function Home() {
                 Anterior
               </Button>
               <span className="w-full mx-auto text-center text-muted-foreground">
-                {formStep + 1}/3
+                {formStep + 1}/4
               </span>
               <Button
-                disabled={formStep === 2}
+                disabled={formStep === 3}
                 onClick={nextStep}
                 type="button"
                 variant={"secondary"}
@@ -406,16 +536,17 @@ export function Home() {
             </div>
 
             <div
-              className={`  mt-8 md:col-span-2 flex justify-end ${
-                formStep === 2 ? "" : "hidden"
-              }`}
+              className={`  mt-8 md:col-span-2 flex justify-end ${formStep === 3 ? "" : "hidden"
+                }`}
             >
               <Button className="w-full" type="submit">
                 Enviar
               </Button>
+              {errors.root && <p className="mt-2 text-sm text-destructive">{errors.root.message}</p>}
             </div>
           </form>
         </FormProvider>
+
       </ScrollArea>
     </div>
   );
