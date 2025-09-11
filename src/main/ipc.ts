@@ -8,7 +8,7 @@ ipcMain.handle(IPC.GITSTATUS.PULL, async (): Promise<StatusResponse> => {
   try {
     await pullChanges()
     return { isSuccess: true, message: 'Repositorio clonado e atualizado' }
-  } catch (e: any) {
+  } catch (_e: any) {
     return { isSuccess: false, message: e.message }
   }
 })
@@ -17,7 +17,7 @@ ipcMain.handle(IPC.GITSTATUS.CLONE, async (): Promise<StatusResponse> => {
   try {
     await cloneRepository()
     return { isSuccess: true, message: 'Repositorio clonado e atualizado' }
-  } catch (e: any) {
+  } catch (_e: any) {
     return { isSuccess: false, message: e.message }
   }
 })
@@ -27,7 +27,7 @@ ipcMain.handle(IPC.JSON.FETCH, async (): Promise<AppData> => {
     const jsonData = await getJsonData()
     console.log(jsonData)
     return { isSuccess: true, data: jsonData }
-  } catch (e: any) {
+  } catch (_e: any) {
     console.log('dsd')
     return { isSuccess: false, data: await getJsonData() }
   }

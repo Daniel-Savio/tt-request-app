@@ -1,61 +1,59 @@
-import { Button } from "../components/ui/button";
-import { Calendar } from "../components/ui/calendar";
-import { Label } from "../components/ui/label";
+import { Button } from '../components/ui/button'
+import { Calendar } from '../components/ui/calendar'
+import { Label } from '../components/ui/label'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "../components/ui/popover";
+} from '../components/ui/popover'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../components/ui/select";
-import { Separator } from "../components/ui/separator";
+} from '../components/ui/select'
+import { Separator } from '../components/ui/separator'
 import {
   ChevronDownIcon,
   ChevronLeft,
   ChevronRight,
-  CirclePlus,
   FileWarning,
   Github,
   Plus,
-  Trash,
-} from "lucide-react";
-import { useEffect, useId, useState } from "react";
-import { Entrada } from "../components/Input";
-import { Output } from "../components/Output";
-import { FormProvider, useForm, useFieldArray } from "react-hook-form";
-import { ScrollArea } from "../components/ui/scroll-area";
-import { type RequestForm, requestFormSchema } from "../../shared/types";
-import { toast } from "sonner";
-import { useQuery } from "@tanstack/react-query";
-import { Input } from "../components/ui/input";
-import { zodResolver } from "@hookform/resolvers/zod";
-import Tiptap from "renderer/components/TipTap";
+} from 'lucide-react'
+import { useEffect, useId, useState } from 'react'
+import { Entrada } from '../components/Input'
+import { Output } from '../components/Output'
+import { FormProvider, useForm, useFieldArray } from 'react-hook-form'
+import { ScrollArea } from '../components/ui/scroll-area'
+import { type RequestForm, requestFormSchema } from '../../shared/types'
+import { toast } from 'sonner'
+import { useQuery } from '@tanstack/react-query'
+import { Input } from '../components/ui/input'
+import { zodResolver } from '@hookform/resolvers/zod'
+import Tiptap from 'renderer/components/TipTap'
 
 export function Home() {
-  const id = useId();
+  const id = useId()
   //Date-Picker
-  const [open, setOpen] = useState(false);
-  const [date, setDate] = useState<Date | undefined>(undefined);
-  const [formStep, setFormStep] = useState(0);
+  const [open, setOpen] = useState(false)
+  const [date, setDate] = useState<Date | undefined>(undefined)
+  const [formStep, setFormStep] = useState(0)
 
   function nextStep() {
-    setFormStep(formStep + 1);
+    setFormStep(formStep + 1)
   }
   function previousStep() {
-    setFormStep(formStep - 1);
+    setFormStep(formStep - 1)
   }
 
   //Use quary
   const { data } = useQuery({
-    queryKey: ["getJsonData"],
+    queryKey: ['getJsonData'],
     queryFn: async () => {
-      const status = await window.App.cloneGitStatus();
-      toast("Notificação", {
+      const status = await window.App.cloneGitStatus()
+      toast('Notificação', {
         description: status.message,
         invert: true,
         richColors: true,
@@ -65,20 +63,20 @@ export function Home() {
         ) : (
           <Github className="text-red-600 size-4" />
         ),
-      });
+      })
 
-      const response = await window.App.getJsonData();
-      return response.data;
+      const response = await window.App.getJsonData()
+      return response.data
     },
-  });
+  })
 
   //Formulario
   const methods = useForm({
     resolver: zodResolver(requestFormSchema),
     defaultValues: {
-      sigmaConnection: "Com Comunicação",
+      sigmaConnection: 'Com Comunicação',
     },
-  });
+  })
   const {
     register,
     handleSubmit,
@@ -86,31 +84,45 @@ export function Home() {
     watch,
     control,
     formState: { errors },
-  } = methods;
+  } = methods
 
-  const allEntradas = watch("entradas");
-  const selectedIedsFromInput = Array.from(new Map(allEntradas?.flatMap(e => e.ieds).filter(Boolean).map((ied: any) => [ied.name, ied])).values());
+  const allEntradas = watch('entradas')
+  const selectedIedsFromInput = Array.from(
+    new Map(
+      allEntradas
+        ?.flatMap(e => e.ieds)
+        .filter(Boolean)
+        .map((ied: any) => [ied.name, ied])
+    ).values()
+  )
 
-
-  const { fields: entradaFields, append: appendEntrada, remove: removeEntrada } = useFieldArray({
+  const {
+    fields: entradaFields,
+    append: appendEntrada,
+    remove: removeEntrada,
+  } = useFieldArray({
     control,
-    name: "entradas",
-  });
+    name: 'entradas',
+  })
 
-  const { fields: saidaFields, append: appendSaida, remove: removeSaida } = useFieldArray({
+  const {
+    fields: saidaFields,
+    append: appendSaida,
+    remove: removeSaida,
+  } = useFieldArray({
     control,
-    name: "saidas",
-  });
+    name: 'saidas',
+  })
 
-  const invoiceNumber = watch("invoiceNumber");
-  const clientNumber = watch("clientNumber");
+  const invoiceNumber = watch('invoiceNumber')
+  const clientNumber = watch('clientNumber')
 
   useEffect(() => {
     if (invoiceNumber) {
-      setValue("invoiceNumber", invoiceNumber.replace(/\D/g, ""));
+      setValue('invoiceNumber', invoiceNumber.replace(/\D/g, ''))
     }
     if (clientNumber) {
-      setValue("clientNumber", clientNumber.replace(/\D/g, ""));
+      setValue('clientNumber', clientNumber.replace(/\D/g, ''))
     }
     if (
       errors.client ||
@@ -122,21 +134,34 @@ export function Home() {
       errors.salesName ||
       errors.processingDate
     ) {
-      setFormStep(0);
+      setFormStep(0)
     }
-    if (errors.entradas) setFormStep(1);
-    if (errors.sigmaConnection) setFormStep(2);
-    if (errors.saidas) setFormStep(3);
+    if (errors.entradas) setFormStep(1)
+    if (errors.sigmaConnection) setFormStep(2)
+    if (errors.saidas) setFormStep(3)
 
-    setValue("sigmaConnection", "Com Comunicação")
+    if (errors.root) {
+      toast('Erro', {
+        description: (
+          <p className="text-wrap overflow-auto">
+            Houve algum erro no preenchimento do formulário
+          </p>
+        ),
+        invert: true,
+        richColors: true,
+        duration: 2000,
+        icon: <FileWarning className="text-destructive size-4" />,
+      })
+    }
 
-  }, [invoiceNumber, setValue, clientNumber, setValue, errors]);
+    setValue('sigmaConnection', 'Com Comunicação')
+  }, [invoiceNumber, setValue, clientNumber, setValue, errors])
 
   function postForm(data: RequestForm) {
     console.log(data)
 
-    if (data.saidas.length === 0) {
-      toast("Erro", {
+    if (data.entradas?.length !== 0 && data.saidas?.length) {
+      toast('Erro', {
         description: (
           <p className="text-wrap overflow-auto">Inclua ao menos uma saída</p>
         ),
@@ -144,19 +169,18 @@ export function Home() {
         richColors: true,
         duration: 2000,
         icon: <FileWarning className="text-destructive size-4" />,
-      });
+      })
       return
     }
 
-
-    toast("Info", {
+    toast('Info', {
       description: (
         <pre className="text-wrap overflow-auto">{JSON.stringify(data)}</pre>
       ),
       invert: true,
       richColors: true,
       duration: 2000,
-    });
+    })
   }
 
   return (
@@ -167,8 +191,9 @@ export function Home() {
         <FormProvider {...methods}>
           <form className="" onSubmit={handleSubmit(postForm)}>
             <section
-              className={` ${formStep === 0 ? "" : "hidden"
-                } p-2 mb-4 rounded grid grid-cols-1 md:grid-cols-2 gap-4 shadow-md `}
+              className={` ${
+                formStep === 0 ? '' : 'hidden'
+              } p-2 mb-4 rounded grid grid-cols-1 md:grid-cols-2 gap-4 shadow-md `}
             >
               <div>
                 <Label
@@ -180,20 +205,20 @@ export function Home() {
 
                 <Select
                   defaultValue=""
-                  onValueChange={(value) => {
-                    setValue("salesName", value);
+                  onValueChange={value => {
+                    setValue('salesName', value)
                   }}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Jhon Doe" />
                   </SelectTrigger>
                   <SelectContent>
-                    {data?.comercial.map((comercial) => {
+                    {data?.comercial.map(comercial => {
                       return (
                         <SelectItem key={comercial} value={comercial}>
                           {comercial}
                         </SelectItem>
-                      );
+                      )
                     })}
                   </SelectContent>
                 </Select>
@@ -214,20 +239,20 @@ export function Home() {
 
                 <Select
                   defaultValue=""
-                  onValueChange={(value) => {
-                    setValue("processName", value);
+                  onValueChange={value => {
+                    setValue('processName', value)
                   }}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Jane Doe" />
                   </SelectTrigger>
                   <SelectContent>
-                    {data?.processamento.map((processamento) => {
+                    {data?.processamento.map(processamento => {
                       return (
                         <SelectItem key={processamento} value={processamento}>
                           {processamento}
                         </SelectItem>
-                      );
+                      )
                     })}
                   </SelectContent>
                 </Select>
@@ -246,11 +271,11 @@ export function Home() {
                   id={`${id}-email`}
                   placeholder="jhondoe@treetech.com.br"
                   type="email"
-                  {...register("email", {
-                    required: "Campo obrigatório",
+                  {...register('email', {
+                    required: 'Campo obrigatório',
                     pattern: {
                       value: /\S+@\S+\.\S+/,
-                      message: "E-mail inválido",
+                      message: 'E-mail inválido',
                     },
                   })}
                   className=""
@@ -268,7 +293,7 @@ export function Home() {
                 <Input
                   id={`${id}-client`}
                   placeholder="PSI"
-                  {...register("client")}
+                  {...register('client')}
                   className=""
                 />
                 {errors.client && (
@@ -284,7 +309,7 @@ export function Home() {
                 <Input
                   id={`${id}-projeto`}
                   placeholder="ISA ENERGIA"
-                  {...register("project")}
+                  {...register('project')}
                   className=""
                 />
                 {errors.project && (
@@ -301,7 +326,7 @@ export function Home() {
                   id={`${id}-numeroPedido`}
                   placeholder="54321"
                   type="text"
-                  {...register("invoiceNumber")}
+                  {...register('invoiceNumber')}
                   className=""
                 />
                 {errors.invoiceNumber && (
@@ -318,7 +343,7 @@ export function Home() {
                   id={`${id}-clientNumber`}
                   placeholder="12345"
                   type="text"
-                  {...register("clientNumber")}
+                  {...register('clientNumber')}
                   className=""
                 />
                 {errors.clientNumber && (
@@ -338,7 +363,7 @@ export function Home() {
                       id={`${id}-date`}
                       variant="outline"
                     >
-                      {date ? date.toLocaleDateString() : "Escolha a data"}
+                      {date ? date.toLocaleDateString() : 'Escolha a data'}
                       <ChevronDownIcon />
                     </Button>
                   </PopoverTrigger>
@@ -349,10 +374,10 @@ export function Home() {
                     <Calendar
                       captionLayout="dropdown"
                       mode="single"
-                      onSelect={(date) => {
-                        setDate(date);
+                      onSelect={date => {
+                        setDate(date)
                         if (date) {
-                          setValue("processingDate", date);
+                          setValue('processingDate', date)
                         }
                       }}
                       selected={date}
@@ -369,8 +394,9 @@ export function Home() {
 
             {/* STEP 2 */}
             <section
-              className={` ${formStep === 1 ? "" : "hidden"
-                }  p-2 mb-4 rounded gap-4 shadow-md `}
+              className={` ${
+                formStep === 1 ? '' : 'hidden'
+              }  p-2 mb-4 rounded gap-4 shadow-md `}
             >
               <div>
                 <Label className=" text-sm font-medium ">Gateway</Label>
@@ -379,12 +405,12 @@ export function Home() {
                     <SelectValue placeholder="Selecione um IED" />
                   </SelectTrigger>
                   <SelectContent>
-                    {data?.sd.map((sd) => {
+                    {data?.sd.map(sd => {
                       return (
                         <SelectItem key={sd} value={sd}>
                           {sd}
                         </SelectItem>
-                      );
+                      )
                     })}
                   </SelectContent>
                 </Select>
@@ -392,10 +418,19 @@ export function Home() {
 
               <ScrollArea className="max-h-900 mt-4 w-full">
                 <h1 className="text-lg font-bold">
-                  Entradas{" "}
+                  Entradas{' '}
                   <Button
                     className="mt-2 border  size-6 "
-                    onClick={() => appendEntrada({ type: "", protocolo: "", baudRate: "9600", dataBits: "8", parity: "None", stopBits: "1" })}
+                    onClick={() =>
+                      appendEntrada({
+                        type: '',
+                        protocolo: '',
+                        baudRate: '9600',
+                        dataBits: '8',
+                        parity: 'None',
+                        stopBits: '1',
+                      })
+                    }
                     type="button"
                     variant="ghost"
                   >
@@ -405,10 +440,10 @@ export function Home() {
 
                 {entradaFields.map((field, index) => (
                   <Entrada
-                    key={field.id}
-                    index={index}
-                    remove={removeEntrada}
                     data={data}
+                    index={index}
+                    key={field.id}
+                    remove={removeEntrada}
                   />
                 ))}
               </ScrollArea>
@@ -416,8 +451,9 @@ export function Home() {
 
             {/* STEP 3 */}
             <section
-              className={` ${formStep === 2 ? "" : "hidden"
-                }  p-2 mb-4 rounded gap-4 shadow-md `}
+              className={` ${
+                formStep === 2 ? '' : 'hidden'
+              }  p-2 mb-4 rounded gap-4 shadow-md `}
             >
               <div>
                 <Label
@@ -429,26 +465,23 @@ export function Home() {
 
                 <Select
                   defaultValue="Com Comunicação"
-                  onValueChange={(value) => {
-                    setValue("sigmaConnection", value);
+                  onValueChange={value => {
+                    setValue('sigmaConnection', value)
                   }}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Tipo da comunicação" />
-
                   </SelectTrigger>
                   <SelectContent>
-
-                    <SelectItem key={1} value={"Sem Comunicação"}>
+                    <SelectItem key={1} value={'Sem Comunicação'}>
                       Sem Comunicação
                     </SelectItem>
-                    <SelectItem key={2} value={"Com Comunicação"}>
+                    <SelectItem key={2} value={'Com Comunicação'}>
                       Com Comunicação
                     </SelectItem>
-                    <SelectItem key={3} value={"SigmaSync"}>
+                    <SelectItem key={3} value={'SigmaSync'}>
                       Sigma Sync
                     </SelectItem>
-
                   </SelectContent>
                 </Select>
 
@@ -458,30 +491,30 @@ export function Home() {
                   </p>
                 )}
               </div>
-
             </section>
 
             {/* STEP 4 */}
             <section
-              className={` ${formStep === 3 ? "" : "hidden"
-                }  p-2 mb-4 rounded gap-4 shadow-md `}
+              className={` ${
+                formStep === 3 ? '' : 'hidden'
+              }  p-2 mb-4 rounded gap-4 shadow-md `}
             >
               <ScrollArea className="max-h-900 mt-4 w-full">
                 <h1 className="text-lg font-bold">
-                  Saídas{" "}
+                  Saídas{' '}
                   <Button
                     className="mt-2 border  size-6 "
                     onClick={() => {
-                      const firstInput = methods.getValues("entradas.0");
+                      const firstInput = methods.getValues('entradas.0')
                       appendSaida({
-                        type: "TCP/IP",
+                        type: 'TCP/IP',
                         protocolo: firstInput?.protocolo,
                         ieds: firstInput?.ieds,
-                        baudRate: "9600",
-                        dataBits: "8",
-                        parity: "None",
-                        stopBits: "1",
-                      });
+                        baudRate: '9600',
+                        dataBits: '8',
+                        parity: 'None',
+                        stopBits: '1',
+                      })
                     }}
                     type="button"
                     variant="ghost"
@@ -492,19 +525,17 @@ export function Home() {
 
                 {saidaFields.map((field, index) => (
                   <Output
-                    key={field.id}
-                    index={index}
-                    remove={removeSaida}
                     data={data}
+                    index={index}
+                    key={field.id}
+                    remove={removeSaida}
                     selectedIedsFromInput={selectedIedsFromInput}
                   />
                 ))}
               </ScrollArea>
               <div className="mt-4">
-
                 <Tiptap name="comments"></Tiptap>
               </div>
-
             </section>
 
             <Separator></Separator>
@@ -515,7 +546,7 @@ export function Home() {
                 disabled={formStep === 0}
                 onClick={previousStep}
                 type="button"
-                variant={"secondary"}
+                variant={'secondary'}
               >
                 <ChevronLeft />
                 Anterior
@@ -527,7 +558,7 @@ export function Home() {
                 disabled={formStep === 3}
                 onClick={nextStep}
                 type="button"
-                variant={"secondary"}
+                variant={'secondary'}
               >
                 Próximo
                 <ChevronRight />
@@ -536,18 +567,22 @@ export function Home() {
             </div>
 
             <div
-              className={`  mt-8 md:col-span-2 flex justify-end ${formStep === 3 ? "" : "hidden"
-                }`}
+              className={`  mt-8 md:col-span-2 flex justify-end ${
+                formStep === 3 ? '' : 'hidden'
+              }`}
             >
               <Button className="w-full" type="submit">
                 Enviar
               </Button>
-              {errors.root && <p className="mt-2 text-sm text-destructive">{errors.root.message}</p>}
+              {errors.root && (
+                <p className="mt-2 text-sm text-destructive">
+                  {errors.root.message}
+                </p>
+              )}
             </div>
           </form>
         </FormProvider>
-
       </ScrollArea>
     </div>
-  );
+  )
 }

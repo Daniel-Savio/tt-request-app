@@ -5,26 +5,24 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "./ui/sheet";
-import { Button } from "./ui/button";
-import { ScrollArea } from "./ui/scroll-area";
-import { Plus } from "lucide-react";
-import { Separator } from "./ui/separator";
+} from './ui/sheet'
+import { Button } from './ui/button'
+import { ScrollArea } from './ui/scroll-area'
+import { Plus } from 'lucide-react'
+import { Separator } from './ui/separator'
 
 export function InputIedSidebar({
   ieds,
   onAddIed,
 }: {
-  ieds: { name: string; address: string; modules?: string; comment?: string }[];
-  onAddIed: (ied: { name: string; address: string }) => void;
+  ieds: { name: string; address: string; modules?: string; comment?: string }[]
+  onAddIed: (ied: { name: string; address: string }) => void
 }) {
-
-
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="ghost" className="border border-primary">
-          Adicionar IEDs <Plus className="text-primary"></Plus>{" "}
+        <Button className="border border-primary" variant="ghost">
+          Adicionar IEDs <Plus className="text-primary"></Plus>{' '}
         </Button>
       </SheetTrigger>
       <SheetContent className=" w-[400px] sm:w-[540px]">
@@ -37,16 +35,14 @@ export function InputIedSidebar({
 
         <ScrollArea className="h-[calc(100%-120px)] p-4">
           <div className="flex flex-col gap-2">
-            {ieds.map((ied) => (
+            {ieds.map(ied => (
               <div className="p-1" key={ied.name}>
-                <div
-                  className="flex items-center justify-between"
-                >
+                <div className="flex items-center justify-between">
                   <div>
                     <span>{ied.name}</span>
                   </div>
                   <Button
-                    onClick={() => onAddIed({ name: ied.name, address: "" })}
+                    onClick={() => onAddIed({ name: ied.name, address: '' })}
                   >
                     <Plus></Plus>
                   </Button>
@@ -58,5 +54,5 @@ export function InputIedSidebar({
         </ScrollArea>
       </SheetContent>
     </Sheet>
-  );
+  )
 }

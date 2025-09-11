@@ -51,13 +51,17 @@ const itemSchema = z.object({
   dataBits: z.string().optional(),
   parity: z.string().optional(),
   stopBits: z.string().optional(),
-  ieds: z.array(z.object({
-    name: z.string(),
-    address: z.string(),
-    modules: z.string().optional(),
-    comment: z.string().optional(),
-  })).optional(),
-});
+  ieds: z
+    .array(
+      z.object({
+        name: z.string(),
+        address: z.string(),
+        modules: z.string().optional(),
+        comment: z.string().optional(),
+      })
+    )
+    .optional(),
+})
 
 export const requestFormSchema = z.object({
   salesName: z
@@ -75,8 +79,8 @@ export const requestFormSchema = z.object({
   clientNumber: z.string().regex(/^\d+$/, 'Insira um número de cliente válido'),
   processingDate: z.date('Selecione uma data válida'),
   entradas: z.array(itemSchema).optional(),
-  saidas: z.array(itemSchema, "Insira ao menos uma saída"),
-  sigmaConnection: z.string("Escolha uma opção e envie novamente"),
+  saidas: z.array(itemSchema, 'Insira ao menos uma saída'),
+  sigmaConnection: z.string('Escolha uma opção e envie novamente'),
   comments: z.string().optional(),
 })
 

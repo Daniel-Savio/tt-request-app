@@ -1,77 +1,98 @@
-import { useFieldArray, useFormContext } from "react-hook-form";
-import { useEffect } from "react";
-import { Button } from "./ui/button";
-import { CircleQuestionMark, FileQuestionMark, Trash } from "lucide-react";
-import { Label } from "./ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { Input } from "./ui/input";
-import { Separator } from "./ui/separator";
-import { IedSidebar } from "./IedSidebar";
-import { IedList } from "./IedList";
-import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { useFieldArray, useFormContext } from 'react-hook-form'
+import { useEffect } from 'react'
+import { Button } from './ui/button'
+import { CircleQuestionMark, Trash } from 'lucide-react'
+import { Label } from './ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from './ui/select'
+import { Input } from './ui/input'
+import { Separator } from './ui/separator'
+import { IedSidebar } from './IedSidebar'
+import { IedList } from './IedList'
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip'
 
-export function Entrada({ index, remove, data }: { index: number, remove: (index: number) => void, data: any }) {
-  const { control, register, watch, setValue } = useFormContext();
-  const entradaType = watch(`entradas.${index}.type`);
-  const ieds = watch(`entradas.${index}.ieds`);
-  const allEntradas = watch(`entradas`);
-  const baudRate = watch(`entradas.${index}.baudRate`);
-  const dataBits = watch(`entradas.${index}.dataBits`);
-  const parity = watch(`entradas.${index}.parity`);
-  const stopBits = watch(`entradas.${index}.stopBits`);
+export function Entrada({
+  index,
+  remove,
+  data,
+}: {
+  index: number
+  remove: (index: number) => void
+  data: any
+}) {
+  const { control, register, watch, setValue } = useFormContext()
+  const entradaType = watch(`entradas.${index}.type`)
+  const ieds = watch(`entradas.${index}.ieds`)
+  const allEntradas = watch(`entradas`)
+  const baudRate = watch(`entradas.${index}.baudRate`)
+  const dataBits = watch(`entradas.${index}.dataBits`)
+  const parity = watch(`entradas.${index}.parity`)
+  const stopBits = watch(`entradas.${index}.stopBits`)
 
   useEffect(() => {
     if (!baudRate) {
-      setValue(`entradas.${index}.baudRate`, "9600");
+      setValue(`entradas.${index}.baudRate`, '9600')
     }
     if (!dataBits) {
-      setValue(`entradas.${index}.dataBits`, "8");
+      setValue(`entradas.${index}.dataBits`, '8')
     }
     if (!parity) {
-      setValue(`entradas.${index}.parity`, "None");
+      setValue(`entradas.${index}.parity`, 'None')
     }
     if (!stopBits) {
-      setValue(`entradas.${index}.stopBits`, "1");
+      setValue(`entradas.${index}.stopBits`, '1')
     }
-  }, [baudRate, dataBits, parity, stopBits, index, setValue]);
+  }, [baudRate, dataBits, parity, stopBits, index, setValue])
 
   const filteredEntradas = data?.entradas.filter((entrada: string) => {
-    const isAlreadySelected = allEntradas.some((e: any, i: number) => i !== index && e.type === entrada);
+    const isAlreadySelected = allEntradas.some(
+      (e: any, i: number) => i !== index && e.type === entrada
+    )
 
-    if (isAlreadySelected && (entrada === "71-72" || entrada === "74-75")) {
-      return false;
+    if (isAlreadySelected && (entrada === '71-72' || entrada === '74-75')) {
+      return false
     }
 
-    const is7172Selected = allEntradas.some((e: any, i: number) => i !== index && e.type === "71-72");
-    const is7475Selected = allEntradas.some((e: any, i: number) => i !== index && e.type === "74-75");
-    const is717273Selected = allEntradas.some((e: any, i: number) => i !== index && e.type === "71-72-73");
+    const is7172Selected = allEntradas.some(
+      (e: any, i: number) => i !== index && e.type === '71-72'
+    )
+    const is7475Selected = allEntradas.some(
+      (e: any, i: number) => i !== index && e.type === '74-75'
+    )
+    const is717273Selected = allEntradas.some(
+      (e: any, i: number) => i !== index && e.type === '71-72-73'
+    )
 
-    if (entrada === "71-72-73" && (is7172Selected || is7475Selected)) {
-      return false;
+    if (entrada === '71-72-73' && (is7172Selected || is7475Selected)) {
+      return false
     }
 
-    if ((entrada === "71-72" || entrada === "74-75") && is717273Selected) {
-      return false;
+    if ((entrada === '71-72' || entrada === '74-75') && is717273Selected) {
+      return false
     }
 
-    return true;
-  });
-
+    return true
+  })
 
   const { append: appendIed, remove: removeIed } = useFieldArray({
     control,
     name: `entradas.${index}.ieds`,
-  });
+  })
 
   return (
     <div className="flex flex-col gap-2 ml-6 mt-4">
       <h1 className="text-lg flex gap-2 items-center font-bold">
         {index + 1}-) Entrada
         <Button
+          className="w-fit border size-6 "
           onClick={() => remove(index)}
           type="button"
-          variant={"ghost"}
-          className="w-fit border size-6 "
+          variant={'ghost'}
         >
           <Trash className="text-destructive" />
         </Button>
@@ -80,9 +101,8 @@ export function Entrada({ index, remove, data }: { index: number, remove: (index
       <Label>Protocolo</Label>
 
       <Select
-        onValueChange={(value) =>
-          setValue(`entradas.${index}.protocolo`, value)
-        }>
+        onValueChange={value => setValue(`entradas.${index}.protocolo`, value)}
+      >
         <SelectTrigger className="w-full">
           <SelectValue placeholder="Selecione o protocolo" />
         </SelectTrigger>
@@ -96,9 +116,7 @@ export function Entrada({ index, remove, data }: { index: number, remove: (index
       </Select>
 
       <Select
-        onValueChange={(value) =>
-          setValue(`entradas.${index}.type`, value)
-        }
+        onValueChange={value => setValue(`entradas.${index}.type`, value)}
       >
         <SelectTrigger className="w-full">
           <SelectValue placeholder="Selecione o tipo da entrada" />
@@ -112,12 +130,13 @@ export function Entrada({ index, remove, data }: { index: number, remove: (index
         </SelectContent>
       </Select>
 
-
       <Label className="mt-2 flex">
         <p>Parâmetros de rede</p>
-        {entradaType && entradaType !== "TCP/IP" && (
+        {entradaType && entradaType !== 'TCP/IP' && (
           <Tooltip>
-            <TooltipTrigger><CircleQuestionMark className="size-4" /></TooltipTrigger>
+            <TooltipTrigger>
+              <CircleQuestionMark className="size-4" />
+            </TooltipTrigger>
             <TooltipContent>
               <pre>
                 Parâmetros de rede serial
@@ -127,9 +146,11 @@ export function Entrada({ index, remove, data }: { index: number, remove: (index
             </TooltipContent>
           </Tooltip>
         )}
-        {entradaType && entradaType === "TCP/IP" && (
+        {entradaType && entradaType === 'TCP/IP' && (
           <Tooltip>
-            <TooltipTrigger><CircleQuestionMark className="size-4" /></TooltipTrigger>
+            <TooltipTrigger>
+              <CircleQuestionMark className="size-4" />
+            </TooltipTrigger>
             <TooltipContent>
               <pre>
                 Parâmetros de rede Ethernet
@@ -140,39 +161,33 @@ export function Entrada({ index, remove, data }: { index: number, remove: (index
           </Tooltip>
         )}
       </Label>
-      {entradaType === "TCP/IP" && (
+      {entradaType === 'TCP/IP' && (
         <div className="flex gap-2">
-          <Input
-            placeholder="IP"
-            {...register(`entradas.${index}.ip`)}
-          />
-          <Input
-            placeholder="Port"
-            {...register(`entradas.${index}.port`)}
-          />
+          <Input placeholder="IP" {...register(`entradas.${index}.ip`)} />
+          <Input placeholder="Port" {...register(`entradas.${index}.port`)} />
         </div>
       )}
 
-      {entradaType && entradaType !== "TCP/IP" && (
+      {entradaType && entradaType !== 'TCP/IP' && (
         <div className="flex gap-2">
           <Select
             defaultValue="9600"
-            value={baudRate}
-            onValueChange={(value) =>
+            onValueChange={value =>
               setValue(`entradas.${index}.baudRate`, value)
             }
+            value={baudRate}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Baudrate" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem key={1} value={"9600"}>
+              <SelectItem key={1} value={'9600'}>
                 9600
               </SelectItem>
-              <SelectItem key={2} value={"19200"}>
+              <SelectItem key={2} value={'19200'}>
                 19200
               </SelectItem>
-              <SelectItem key={3} value={"115200"}>
+              <SelectItem key={3} value={'115200'}>
                 115200
               </SelectItem>
             </SelectContent>
@@ -180,42 +195,40 @@ export function Entrada({ index, remove, data }: { index: number, remove: (index
 
           <Select
             defaultValue="8"
-            value={dataBits}
-            onValueChange={(value) =>
+            onValueChange={value =>
               setValue(`entradas.${index}.dataBits`, value)
             }
+            value={dataBits}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Bits de dados" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem key={1} value={"8"}>
+              <SelectItem key={1} value={'8'}>
                 8
               </SelectItem>
-              <SelectItem key={2} value={"7"}>
+              <SelectItem key={2} value={'7'}>
                 7
               </SelectItem>
             </SelectContent>
           </Select>
 
           <Select
-            defaultValue={"None"}
+            defaultValue={'None'}
+            onValueChange={value => setValue(`entradas.${index}.parity`, value)}
             value={parity}
-            onValueChange={(value) =>
-              setValue(`entradas.${index}.parity`, value)
-            }
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Paridade" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem key={1} value={"None"}>
+              <SelectItem key={1} value={'None'}>
                 None
               </SelectItem>
-              <SelectItem key={2} value={"Odd"}>
+              <SelectItem key={2} value={'Odd'}>
                 Odd
               </SelectItem>
-              <SelectItem key={3} value={"Even"}>
+              <SelectItem key={3} value={'Even'}>
                 Even
               </SelectItem>
             </SelectContent>
@@ -223,19 +236,19 @@ export function Entrada({ index, remove, data }: { index: number, remove: (index
 
           <Select
             defaultValue="1"
-            value={stopBits}
-            onValueChange={(value) =>
+            onValueChange={value =>
               setValue(`entradas.${index}.stopBits`, value)
             }
+            value={stopBits}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Bit de parada" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem key={1} value={"1"}>
+              <SelectItem key={1} value={'1'}>
                 1
               </SelectItem>
-              <SelectItem key={2} value={"2"}>
+              <SelectItem key={2} value={'2'}>
                 2
               </SelectItem>
             </SelectContent>
@@ -249,8 +262,12 @@ export function Entrada({ index, remove, data }: { index: number, remove: (index
         ieds_terceiros={data?.ied_terceiros || []}
         onAddIed={appendIed}
       />
-      <IedList fieldName="entradas" entradaIndex={index} ieds={ieds} onRemoveIed={removeIed} />
-
+      <IedList
+        entradaIndex={index}
+        fieldName="entradas"
+        ieds={ieds}
+        onRemoveIed={removeIed}
+      />
     </div>
-  );
+  )
 }
