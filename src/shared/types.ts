@@ -55,6 +55,7 @@ const itemSchema = z.object({
     .array(
       z.object({
         name: z.string(),
+        manufacturer: z.string(),
         address: z.string(),
         modules: z.string().optional(),
         comment: z.string().optional(),
@@ -78,6 +79,7 @@ export const requestFormSchema = z.object({
   invoiceNumber: z.string().regex(/^\d+$/, 'Insira um número de pedido válido'),
   clientNumber: z.string().regex(/^\d+$/, 'Insira um número de cliente válido'),
   processingDate: z.date('Selecione uma data válida'),
+  gateway: z.string('Escolha o Gateway'),
   entradas: z.array(itemSchema).optional(),
   saidas: z.array(itemSchema, 'Insira ao menos uma saída'),
   sigmaConnection: z.string('Escolha uma opção e envie novamente'),

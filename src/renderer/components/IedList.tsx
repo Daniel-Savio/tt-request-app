@@ -46,6 +46,7 @@ export function IedList({
             <div className="flex flex-col gap-2">
               <span className="flex items-center justify-between gap-2">
                 <Badge className="text-slate-50 h-4 shadow font-normal">
+                  <legend>{field.manufacturer}:</legend>
                   {field.name}
                 </Badge>
                 <Button
@@ -70,6 +71,9 @@ export function IedList({
                   )}
                   className="w-full h-5 bg-card! text-sm text-center rounded-xs"
                   type="number"
+                  defaultValue={index + 1}
+                  max={255}
+                  min={1}
                 />
                 {field.name === 'BM' && (
                   <>
@@ -85,6 +89,25 @@ export function IedList({
                       className="w-full h-5 bg-card! text-sm text-center rounded-xs"
                       defaultValue={1}
                       max={3}
+                      min={1}
+                      type="number"
+                    />
+                  </>
+                )}
+                {field.name === 'COMM4' && (
+                  <>
+                    <Label className="text-muted-foreground text-xs font-semibold">
+                      SPSs conectados
+                    </Label>
+                    <Input
+                      id={field.id}
+                      placeholder="Qtd de SPS conectados"
+                      {...register(
+                        `${fieldName}.${entradaIndex}.ieds.${index}.modules`
+                      )}
+                      className="w-full h-5 bg-card! text-sm text-center rounded-xs"
+                      defaultValue={1}
+                      max={18}
                       min={1}
                       type="number"
                     />
