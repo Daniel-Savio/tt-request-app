@@ -1,5 +1,5 @@
 import { ScrollArea } from "../components/ui/scroll-area";
-import { FileInput, FileOutput, Sigma } from "lucide-react";
+import { Check, FileInput, FileOutput, Sigma, X } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { Badge } from "renderer/components/ui/badge";
 import { Button } from "renderer/components/ui/button";
@@ -104,7 +104,7 @@ export function Report() {
               {entrada.ieds?.map((ied, iedIndex) => (
                 <Card className="p-2" key={iedIndex}>
                   <CardTitle className="border-b-2 border-b-primary p-1">
-                    <legend>{ied.manufacturer}</legend>
+                    <legend className="text-muted-foreground text-sm">{ied.manufacturer}</legend>
                      <p>{ied.name}</p>
                   </CardTitle>
                  <CardContent>
@@ -132,11 +132,13 @@ export function Report() {
           <Sigma />
           <h2 className="text-lg font-semibold">Comunicação com o Sigma:</h2>
           <p>{formData.sigmaConnection}</p>
+          {formData.sigmaConnection !== "Sem Comunicação"? <Check className="text-primary border rounded-full p-1 border-primary" /> : <X className="text-destructive border rounded-full p-1 border-destructive"/>}
         </div>
 
-        {formData.saidas.map((saida, index) => (
-          <div key={index} className="mt-4 p-4 border rounded">
+        {formData.saidas?.map((saida, index) => (
+          <div key={index} className="p-4 border rounded">
             <header className="flex gap-5 items-center mb-4">
+              <Badge className="text-slate-50">{index + 1}</Badge>
               <h3 className="font-bold">Protocolo: {saida.protocolo}</h3>
               <h3 className="font-bold">Tipo: {saida.type}</h3>
             </header>
@@ -151,20 +153,31 @@ export function Report() {
 
             {saida.type === "TCP/IP" && (
               <div className="flex gap-2 ">
-                <p>
-                  IP do {formData.gateway}: {saida.ip}
-                </p>
+                <p>IP do {formData.gateway}: {saida.ip}</p>
                 <Separator orientation="vertical" className=""/>
-                <p>Porta de copmunicação: {saida.port}</p>
+                <p>Porta de comunicação: {saida.port}</p>
               </div>
             )}
 
             {saida.ieds && saida.ieds.length > 0 && (
-              <h3 className="font-semibold mt-2">IEDs:</h3>
+              <h3 className="font-semibold my-2">IEDs:</h3>
             )}
-            <ul>
+            <ul className="flex gap-4">
               {saida.ieds?.map((ied, iedIndex) => (
-                <li key={iedIndex}>{ied.name}</li>
+                <Card className="p-2" key={iedIndex}>
+                  <CardTitle className="border-b-2 border-b-primary p-1">
+                    <legend className="text-muted-foreground text-sm">{ied.manufacturer}</legend>
+                     <p>{ied.name}</p>
+                  </CardTitle>
+                 <CardContent>
+                  <p>Endereço: {ied.address}</p>
+                  {ied.modules && (
+                    <p>
+                      Módulos: {ied.modules}</p>
+                  )}
+                 </CardContent>
+                  
+                </Card>
               ))}
             </ul>
           </div>

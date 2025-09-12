@@ -428,6 +428,7 @@ export function Home() {
                         dataBits: "8",
                         parity: "None",
                         stopBits: "1",
+                        ieds: [],
                       })
                     }
                     type="button"

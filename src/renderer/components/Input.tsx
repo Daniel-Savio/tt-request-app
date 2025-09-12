@@ -261,6 +261,7 @@ export function Entrada({
         ieds={data?.ied || []}
         ieds_terceiros={data?.ied_terceiros || []}
         onAddIed={appendIed}
+        currentIeds={ieds}
       />
       <IedList
         entradaIndex={index}

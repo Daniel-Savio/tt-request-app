@@ -16,10 +16,12 @@ export function IedSidebar({
   ieds,
   ieds_terceiros,
   onAddIed,
+  currentIeds,
 }: {
   ieds: { nome: string }[]
   ieds_terceiros: { nome: string; fabricante: string }[]
   onAddIed: (ied: { name: string; address: string, manufacturer: string }) => void
+  currentIeds: any[]
 }) {
   return (
     <Sheet>
@@ -51,7 +53,7 @@ export function IedSidebar({
                     <span>{ied.nome}</span>
                   </div>
                   <Button
-                    onClick={() => onAddIed({ name: ied.nome, address: '', manufacturer: 'Treetech' })}
+                    onClick={() => onAddIed({ name: ied.nome, address: `${currentIeds.length + 1}`, manufacturer: 'Treetech' })}
                   >
                     <Plus></Plus>
                   </Button>
@@ -72,7 +74,7 @@ export function IedSidebar({
                     <span>{ied.nome}</span>
                   </div>
                   <Button
-                    onClick={() => onAddIed({ name: ied.nome, address: '', manufacturer: ied.fabricante })}
+                    onClick={() => onAddIed({ name: ied.nome, address: `${currentIeds.length + 1}`, manufacturer: ied.fabricante })}
                   >
                     <Plus></Plus>
                   </Button>
