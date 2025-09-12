@@ -179,7 +179,7 @@ export function Home() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center ">
+    <div className="flex flex-col items-center justify-center  ">
       <ScrollArea className="w-full h-[900px] p-4 rounded-lg">
         <h1 className="text-2xl font-bold mb-4 ">Formulário de Requisição</h1>
 
