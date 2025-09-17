@@ -10,7 +10,7 @@ function installGitIfNeeded() {
   try {
     execSync('git --version')
   } catch (_error) {
-    console.log('Git not found. Installing...')
+    console.log('Git not found. Instaling...')
     const platform = process.platform
     let installCommand = ''
 

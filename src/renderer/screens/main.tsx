@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "../components/ui/select";
 import { Separator } from "../components/ui/separator";
+
 import {
   ChevronDownIcon,
   ChevronLeft,
@@ -22,6 +23,7 @@ import {
   Github,
   Plus,
 } from "lucide-react";
+import { ChangeEvent,useRef,  } from "react";
 import { useEffect, useId, useState } from "react";
 import { Entrada } from "../components/Input";
 import { Output } from "../components/Output";
@@ -71,6 +73,57 @@ export function Home() {
       return response.data;
     },
   });
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImport = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const importedData = JSON.parse(e.target?.result as string);
+          methods.reset(importedData);
+          toast("Sucesso", {
+            description: "Formulário importado com sucesso!",
+            invert: true,
+            richColors: true,
+            duration: 2000,
+          });
+        } catch (error) {
+          toast("Erro", {
+            description: "Arquivo JSON inválido.",
+            invert: true,
+            richColors: true,
+            duration: 2000,
+            icon: <FileWarning className="text-destructive size-4" />,
+          });
+          console.error("Error parsing JSON:", error);
+        }
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  const handleExport = () => {
+    const data = methods.getValues();
+    const json = JSON.stringify(data, null, 2);
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "request-form.json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast("Sucesso", {
+      description: "Formulário exportado com sucesso!",
+      invert: true,
+      richColors: true,
+      duration: 2000,
+    });
+  };
 
   //Formulario
   const methods = useForm({
@@ -190,6 +243,21 @@ export function Home() {
                 formStep === 0 ? "" : "hidden"
               } p-2 mb-4 rounded grid grid-cols-1 md:grid-cols-2 gap-4 shadow-md `}
             >
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleImport}
+                accept=".json"
+                className="hidden"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                className="w-full col-span-full"
+              >
+                Importar Formulário
+              </Button>
               <div>
                 <Label
                   className=" text-sm font-medium "
@@ -567,12 +635,21 @@ export function Home() {
             </div>
 
             <div
-              className={`  mt-8 md:col-span-2 flex justify-end ${
+              className={`  mt-8 md:col-span-2 space-y-4  justify-end ${
                 formStep === 3 ? "" : "hidden"
               }`}
             >
               <Button className="w-full" type="submit">
                 Enviar
+              </Button>
+                           
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleExport}
+                className="w-full mr-2"
+              >
+                Exportar Formulário
               </Button>
               {errors.root && (
                 <p className="mt-2 text-sm text-destructive">

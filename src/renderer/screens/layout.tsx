@@ -3,7 +3,7 @@ import { Link, Outlet } from 'react-router-dom'
 export function Layout() {
   return (
     <div className="">
-      {/* <nav className="bg-background p-4">
+      <nav className="bg-background p-4">
         <ul className="flex space-x-4">
           <li>
             <Link to="/">Home</Link>
@@ -15,7 +15,7 @@ export function Layout() {
             <Link to="/login">Login</Link>
           </li>
         </ul>
-      </nav> */}
+      </nav>
       <main className="mx-auto overflow-y-hidden">
         <Outlet />
       </main>
