@@ -22,7 +22,7 @@ async function createPackageJSONDistVersion() {
       ),
 
       writeFile(
-        resolve(getDevFolder(main), packageJSON.pnpm.onlyBuiltDependenciesFile),
+        resolve(getDevFolder(main), packageJSON.npm.onlyBuiltDependenciesFile),
         JSON.stringify(trustedDependencies, null, 2)
       ),
     ])

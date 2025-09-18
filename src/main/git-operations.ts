@@ -3,8 +3,9 @@ import os from 'node:os'
 import path from 'node:path'
 import dns from 'node:dns'
 import fs from 'node:fs/promises'
+import { app } from 'electron'
 
-const localPath = path.join(__dirname, 'request-info')
+const localPath = path.join(app.getPath('userData'), 'request-info')
 const repoUrl = 'https://github.com/Daniel-Savio/request-info'
 
 async function checkInternetConnection(): Promise<void> {

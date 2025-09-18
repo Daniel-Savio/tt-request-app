@@ -8,7 +8,7 @@ export async function MainWindow() {
   const window = createWindow({
     id: 'main',
     title: displayName,
-    width: 800,
+    width: 1100,
     height: 1000,
     show: false,
     center: false,

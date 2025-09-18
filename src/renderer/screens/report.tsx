@@ -1,6 +1,6 @@
 import { ScrollArea } from "../components/ui/scroll-area";
-import { Check, FileInput, FileOutput, Sigma, X } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { Check, ChevronLeft, FileInput, FileOutput, Sigma, X } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Badge } from "renderer/components/ui/badge";
 import { Button } from "renderer/components/ui/button";
 import { Card, CardContent, CardTitle } from "renderer/components/ui/card";
@@ -11,6 +11,8 @@ import { useRef } from "react";
 
 
 export function Report() {
+
+  const navigate = useNavigate()
   const location = useLocation();
   const formData: RequestForm = location.state?.formData;
   const contentRef = useRef<HTMLDivElement>(null);
@@ -22,13 +24,14 @@ export function Report() {
   }
 
   return (
-    <ScrollArea className=" p-4 max-w-4xl mx-auto my-12 h-[900px] shadow-lg text-slate-950">
+    <ScrollArea className=" p-4 max-w-4xl mx-auto h-[900px] shadow-lg ">
       <div className="flex justify-between items-center mb-8">
+        <Button onClick={() => navigate(-1)} variant={"outline"}><ChevronLeft /></Button>
         <Button onClick={handlePrint}>Exportar para PDF</Button>
       </div>
-      <div ref={contentRef} className="bg-white pl-8 px-2 pt-8 max-w-4xl mx-auto min-h-[1123px]">
-        
-         <h1 className="text-2xl text-slate-950 font-bold">Relatório de Requisição</h1>
+      <div ref={contentRef} className="bg-white text-slate-950 pl-8 px-2 pt-8 max-w-4xl mx-auto min-h-[1123px]">
+
+        <h1 className="text-2xl text-slate-950 font-bold">Relatório de Requisição</h1>
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
             <h2 className="text-lg font-semibold">Responsável Comercial</h2>
@@ -95,7 +98,7 @@ export function Report() {
               {entrada.type === "TCP/IP" && (
                 <div className="flex gap-2 ">
                   <p>IP do IED: {entrada.ip}</p>
-                  <Separator orientation="vertical" className=""/>
+                  <Separator orientation="vertical" className="" />
                   <p>Porta de copmunicação do IED: {entrada.port}</p>
                 </div>
               )}
@@ -108,16 +111,16 @@ export function Report() {
                   <Card className="p-2 text-slate-950 bg-slate-50" key={iedIndex}>
                     <CardTitle className="border-b-2 border-b-primary p-1">
                       <legend className="text-muted-foreground text-sm">{ied.manufacturer}</legend>
-                       <p>{ied.name}</p>
+                      <p>{ied.name}</p>
                     </CardTitle>
-                   <CardContent>
-                    <p>Endereço: {ied.address}</p>
-                    {ied.modules && (
-                      <p>
-                        Módulos: {ied.modules}</p>
-                    )}
-                   </CardContent>
-                    
+                    <CardContent>
+                      <p>Endereço: {ied.address}</p>
+                      {ied.modules && (
+                        <p>
+                          Módulos: {ied.modules}</p>
+                      )}
+                    </CardContent>
+
                   </Card>
                 ))}
               </ul>
@@ -126,9 +129,9 @@ export function Report() {
         </div>
 
 
-       <Separator className="break-after-page bg-slate950"> </Separator>
+        <Separator className="break-after-page bg-slate950"> </Separator>
 
-       {/* Saída */}
+        {/* Saída */}
         <div className="mt-8">
           <h2 className="text-lg font-semibold flex gap-3 text-primary">
             <FileOutput />
@@ -139,7 +142,7 @@ export function Report() {
             <Sigma />
             <h2 className="text-lg font-semibold">Comunicação com o Sigma:</h2>
             <p>{formData.sigmaConnection}</p>
-            {formData.sigmaConnection !== "Sem Comunicação"? <Check className="text-primary border rounded-full p-1 border-primary" /> : <X className="text-destructive border rounded-full p-1 border-destructive"/>}
+            {formData.sigmaConnection !== "Sem Comunicação" ? <Check className="text-primary border rounded-full p-1 border-primary" /> : <X className="text-destructive border rounded-full p-1 border-destructive" />}
           </div>
 
           {formData.saidas?.map((saida, index) => (
@@ -161,7 +164,7 @@ export function Report() {
               {saida.type === "TCP/IP" && (
                 <div className="flex gap-2 ">
                   <p>IP do {formData.gateway}: {saida.ip}</p>
-                  <Separator orientation="vertical" className=""/>
+                  <Separator orientation="vertical" className="" />
                   <p>Porta de comunicação: {saida.port}</p>
                 </div>
               )}
@@ -174,16 +177,16 @@ export function Report() {
                   <Card className="p-2 bg-slate-50 text-slate-950" key={iedIndex}>
                     <CardTitle className="border-b-2 border-b-primary p-1">
                       <legend className="text-muted-foreground text-sm">{ied.manufacturer}</legend>
-                       <p>{ied.name}</p>
+                      <p>{ied.name}</p>
                     </CardTitle>
-                   <CardContent>
-                    <p>Endereço: {ied.address}</p>
-                    {ied.modules && (
-                      <p>
-                        Módulos: {ied.modules}</p>
-                    )}
-                   </CardContent>
-                    
+                    <CardContent>
+                      <p>Endereço: {ied.address}</p>
+                      {ied.modules && (
+                        <p>
+                          Módulos: {ied.modules}</p>
+                      )}
+                    </CardContent>
+
                   </Card>
                 ))}
               </ul>
@@ -191,7 +194,7 @@ export function Report() {
           ))}
         </div>
 
-      <Separator className="break-after-page bg-slate950"> </Separator>
+        <Separator className="break-after-page bg-slate950"> </Separator>
 
         <div className="mt-8">
           <h2 className="text-lg font-semibold">Comentários</h2>

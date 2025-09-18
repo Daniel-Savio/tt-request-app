@@ -20,10 +20,11 @@ import {
   ChevronLeft,
   ChevronRight,
   FileWarning,
+  FolderInput,
   Github,
   Plus,
 } from "lucide-react";
-import { ChangeEvent,useRef,  } from "react";
+import { ChangeEvent, useRef, } from "react";
 import { useEffect, useId, useState } from "react";
 import { Entrada } from "../components/Input";
 import { Output } from "../components/Output";
@@ -36,6 +37,8 @@ import { Input } from "../components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
 import Tiptap from "renderer/components/TipTap";
+import { error } from "console";
+import { setTimeout } from "timers/promises";
 
 export function Home() {
   const navigate = useNavigate();
@@ -76,20 +79,44 @@ export function Home() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleImport = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleImport = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = async (e) => {
         try {
-          const importedData = JSON.parse(e.target?.result as string);
-          methods.reset(importedData);
+          const importedData: RequestForm = JSON.parse(e.target?.result as string);
+          requestForm.reset(importedData);
+
+          importedData.entradas?.forEach((entrada, index) => {
+            requestForm.setValue(`entradas.${index}.type`, entrada.type);
+            requestForm.setValue(`entradas.${index}.protocolo`, entrada.protocolo);
+          });
+
+
           toast("Sucesso", {
             description: "Formulário importado com sucesso!",
             invert: true,
             richColors: true,
             duration: 2000,
           });
+
+
+
+
+          toast("Revise o formulário:", {
+            description: "Preencha uma nova data",
+            invert: true,
+            richColors: true,
+            icon: <FileWarning className="text-destructive size-4" />,
+            duration: 5000,
+          });
+
+          requestForm.setError("processingDate", {
+            type: "manual",
+            message: "Preencha uma nova data",
+          })
+
         } catch (error) {
           toast("Erro", {
             description: "Arquivo JSON inválido.",
@@ -106,7 +133,7 @@ export function Home() {
   };
 
   const handleExport = () => {
-    const data = methods.getValues();
+    const data = requestForm.getValues();
     const json = JSON.stringify(data, null, 2);
     const blob = new Blob([json], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -126,12 +153,13 @@ export function Home() {
   };
 
   //Formulario
-  const methods = useForm({
+  const requestForm = useForm({
     resolver: zodResolver(requestFormSchema),
     defaultValues: {
       sigmaConnection: "Com Comunicação",
     },
   });
+
   const {
     register,
     handleSubmit,
@@ -139,7 +167,7 @@ export function Home() {
     watch,
     control,
     formState: { errors },
-  } = methods;
+  } = requestForm;
 
   const allEntradas = watch("entradas");
   const selectedIedsFromInput = Array.from(
@@ -234,30 +262,36 @@ export function Home() {
   return (
     <div className="flex flex-col items-center justify-center  ">
       <ScrollArea className="w-full h-[900px] p-4 rounded-lg">
-        <h1 className="text-2xl font-bold mb-4 ">Formulário de Requisição</h1>
 
-        <FormProvider {...methods}>
+        <h1 className="text-2xl font-bold mb-4 ">Formulário de Requisição</h1>
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleImport}
+          accept=".json"
+          className="hidden"
+        />
+        <Button
+          className="w-fit p-2"
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+
+        >
+          <FolderInput />
+          Importar Formulário
+        </Button>
+
+        <Separator className="my-4"></Separator>
+        <FormProvider {...requestForm}>
           <form className="" onSubmit={handleSubmit(postForm)}>
+
             <section
-              className={` ${
-                formStep === 0 ? "" : "hidden"
-              } p-2 mb-4 rounded grid grid-cols-1 md:grid-cols-2 gap-4 shadow-md `}
+              className={` ${formStep === 0 ? "" : "hidden"
+                } p-2 mb-4 rounded grid grid-cols-1 md:grid-cols-2 gap-4 shadow-md `}
             >
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleImport}
-                accept=".json"
-                className="hidden"
-              />
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => fileInputRef.current?.click()}
-                className="w-full col-span-full"
-              >
-                Importar Formulário
-              </Button>
+
+
+
               <div>
                 <Label
                   className=" text-sm font-medium "
@@ -267,7 +301,7 @@ export function Home() {
                 </Label>
 
                 <Select
-                  defaultValue=""
+                  value={watch("salesName")}
                   onValueChange={(value) => {
                     setValue("salesName", value);
                   }}
@@ -301,7 +335,7 @@ export function Home() {
                 </Label>
 
                 <Select
-                  defaultValue=""
+                  value={watch("processName")}
                   onValueChange={(value) => {
                     setValue("processName", value);
                   }}
@@ -457,13 +491,13 @@ export function Home() {
 
             {/* STEP 2 */}
             <section
-              className={` ${
-                formStep === 1 ? "" : "hidden"
-              }  p-2 mb-4 rounded gap-4 shadow-md `}
+              className={` ${formStep === 1 ? "" : "hidden"
+                }  p-2 mb-4 rounded gap-4 shadow-md `}
             >
               <div>
                 <Label className=" text-sm font-medium ">Gateway</Label>
                 <Select
+                  value={watch("gateway")}
                   onValueChange={(value) => {
                     setValue("gateway", value);
                   }}
@@ -505,6 +539,11 @@ export function Home() {
                     <Plus className="text-primary" />
                   </Button>
                 </h1>
+                {errors.entradas && (
+                  <p className="mt-2 text-sm text-destructive">
+                    {errors.entradas.message}
+                  </p>
+                )}
 
                 {entradaFields.map((field, index) => (
                   <Entrada
@@ -519,9 +558,8 @@ export function Home() {
 
             {/* STEP 3 */}
             <section
-              className={` ${
-                formStep === 2 ? "" : "hidden"
-              }  p-2 mb-4 rounded gap-4 shadow-md `}
+              className={` ${formStep === 2 ? "" : "hidden"
+                }  p-2 mb-4 rounded gap-4 shadow-md `}
             >
               <div>
                 <Label
@@ -532,6 +570,7 @@ export function Home() {
                 </Label>
 
                 <Select
+                  value={watch("sigmaConnection")}
                   defaultValue="Com Comunicação"
                   onValueChange={(value) => {
                     setValue("sigmaConnection", value);
@@ -563,9 +602,8 @@ export function Home() {
 
             {/* STEP 4 */}
             <section
-              className={` ${
-                formStep === 3 ? "" : "hidden"
-              }  p-2 mb-4 rounded gap-4 shadow-md `}
+              className={` ${formStep === 3 ? "" : "hidden"
+                }  p-2 mb-4 rounded gap-4 shadow-md `}
             >
               <ScrollArea className="max-h-900 mt-4 w-full">
                 <h1 className="text-lg font-bold">
@@ -573,7 +611,7 @@ export function Home() {
                   <Button
                     className="mt-2 border  size-6 "
                     onClick={() => {
-                      const firstInput = methods.getValues("entradas.0");
+                      const firstInput = requestForm.getValues("entradas.0");
                       appendSaida({
                         type: "TCP/IP",
                         protocolo: firstInput?.protocolo,
@@ -635,21 +673,20 @@ export function Home() {
             </div>
 
             <div
-              className={`  mt-8 md:col-span-2 space-y-4  justify-end ${
-                formStep === 3 ? "" : "hidden"
-              }`}
+              className={`  mt-8 md:col-span-2 space-y-4  justify-end ${formStep === 3 ? "" : "hidden"
+                }`}
             >
               <Button className="w-full" type="submit">
                 Enviar
               </Button>
-                           
+
               <Button
                 type="button"
                 variant="outline"
                 onClick={handleExport}
                 className="w-full mr-2"
               >
-                Exportar Formulário
+                Exportar Template
               </Button>
               {errors.root && (
                 <p className="mt-2 text-sm text-destructive">
@@ -659,6 +696,10 @@ export function Home() {
             </div>
           </form>
         </FormProvider>
+
+
+
+
       </ScrollArea>
     </div>
   );
