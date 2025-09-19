@@ -15,8 +15,18 @@ export function InputIedSidebar({
   ieds,
   onAddIed,
 }: {
-  ieds: { name: string; address: string; modules?: string; comment?: string, manufacturer: string }[]
-  onAddIed: (ied: { name: string; address: string, manufacturer: string }) => void
+  ieds: {
+    name: string
+    address: string
+    modules?: string
+    comment?: string
+    manufacturer: string
+  }[]
+  onAddIed: (ied: {
+    name: string
+    address: string
+    manufacturer: string
+  }) => void
 }) {
   return (
     <Sheet>
@@ -42,7 +52,13 @@ export function InputIedSidebar({
                     <span>{ied.name}</span>
                   </div>
                   <Button
-                    onClick={() => onAddIed({ name: ied.name, address: '', manufacturer: ied.manufacturer })}
+                    onClick={() =>
+                      onAddIed({
+                        name: ied.name,
+                        address: '',
+                        manufacturer: ied.manufacturer,
+                      })
+                    }
                   >
                     <Plus></Plus>
                   </Button>

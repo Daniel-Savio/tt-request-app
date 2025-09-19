@@ -25,9 +25,14 @@ export interface AppData {
   data: DataInfo
 }
 
+export interface Employee {
+  name: string
+  email: string
+  departament: string
+}
+
 export interface DataInfo {
-  comercial: string[]
-  processamento: string[]
+  requester: Employee[]
   sd: string[]
   entradas: string[]
   protocolos_entrada: string[]
@@ -65,15 +70,19 @@ const itemSchema = z.object({
 })
 
 export const requestFormSchema = z.object({
-  salesName: z
+  requester: z
     .string('Insira um nome válido e envie novamente')
     .min(3, 'Insira um nome válido')
     .nonempty('Campo obrigatório'),
-  processName: z
-    .string('Insira um nome válido e envie novamente')
-    .min(3, 'Insira um nome válido')
+  email: z
+    .string('Insira um e-mail válido e envie novamente')
+    .email('Insira um e-mail válido')
     .nonempty('Campo obrigatório'),
-  email: z.email(),
+  departament: z
+    .string('Insira um departamento válido e envie novamente')
+    .min(3, 'Insira um departamento válido')
+    .nonempty('Campo obrigatório'),
+  isEqual: z.boolean('Escolha uma opção e envie novamente').optional(),
   client: z.string().min(3, 'Insira um nome válido'),
   project: z.string().min(3, 'Insira um nome válido'),
   invoiceNumber: z.string().regex(/^\d+$/, 'Insira um número de pedido válido'),

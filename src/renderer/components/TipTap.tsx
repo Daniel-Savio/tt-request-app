@@ -27,7 +27,6 @@ function MenuBar({ editor }: { editor: Editor }) {
         canStrike: ctx.editor.can().chain().toggleStrike().run() ?? false,
         isBulletList: ctx.editor.isActive('bulletList') ?? false,
         isOrderedList: ctx.editor.isActive('orderedList') ?? false,
-
       }
     },
   })
@@ -105,7 +104,6 @@ export default ({ name }: { name: string }) => {
     onUpdate: ({ editor }) => {
       field.onChange(editor.getHTML())
     },
-
   })
 
   return (

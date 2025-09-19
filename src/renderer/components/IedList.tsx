@@ -1,12 +1,12 @@
-import { useFormContext } from "react-hook-form";
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
-import { Trash } from "lucide-react";
-import { Badge } from "./ui/badge";
-import { Label } from "./ui/label";
+import { useFormContext } from 'react-hook-form'
+import { Input } from './ui/input'
+import { Button } from './ui/button'
+import { Trash } from 'lucide-react'
+import { Badge } from './ui/badge'
+import { Label } from './ui/label'
 
-import { Card } from "./ui/card";
-import { useEffect } from "react";
+import { Card } from './ui/card'
+import { useEffect } from 'react'
 
 export function IedList({
   entradaIndex,
@@ -14,18 +14,18 @@ export function IedList({
   onRemoveIed,
   fieldName,
 }: {
-  entradaIndex: number;
-  ieds: any[];
-  onRemoveIed: (index: number) => void;
-  fieldName: string;
+  entradaIndex: number
+  ieds: any[]
+  onRemoveIed: (index: number) => void
+  fieldName: string
 }) {
   const {
     register,
     watch,
     setValue,
     formState: { errors: _errors },
-  } = useFormContext();
-  const currentIeds = watch(`${fieldName}.${entradaIndex}.ieds`);
+  } = useFormContext()
+  const currentIeds = watch(`${fieldName}.${entradaIndex}.ieds`)
 
   useEffect(() => {
     if (currentIeds) {
@@ -35,20 +35,19 @@ export function IedList({
             `${fieldName}.${entradaIndex}.ieds.${index}.address`,
             index + 1,
             { shouldValidate: true }
-          );
+          )
         }
-      });
-
+      })
     }
-  }, [currentIeds, setValue, fieldName, entradaIndex]);
+  }, [currentIeds, setValue, fieldName, entradaIndex])
 
-  const hasEmptyAddress = currentIeds?.some((ied: any) => !ied.address);
+  const hasEmptyAddress = currentIeds?.some((ied: any) => !ied.address)
   const hasRepetitiveAddress = currentIeds?.some(
     (ied: any, index: number) =>
       currentIeds.findIndex(
         (otherIed: any) => otherIed.address === ied.address
       ) !== index && ied.address
-  );
+  )
 
   return (
     <>
@@ -60,7 +59,9 @@ export function IedList({
           >
             <div className="flex flex-col gap-2">
               <span className="flex items-center justify-between gap-2">
-                <Badge className={`text-slate-50 h-4 shadow font-normal   ${field.manufacturer === 'Treetech' ? `` : `bg-blue-500`}`}>
+                <Badge
+                  className={`text-slate-50 h-4 shadow font-normal   ${field.manufacturer === 'Treetech' ? `` : `bg-blue-500`}`}
+                >
                   <legend>{field.manufacturer}:</legend>
                   {field.name}
                 </Badge>
@@ -85,11 +86,11 @@ export function IedList({
                     `${fieldName}.${entradaIndex}.ieds.${index}.address`
                   )}
                   className="w-full h-5 bg-card! text-sm text-center rounded-xs"
-                  type="number"
                   max={255}
                   min={1}
+                  type="number"
                 />
-                {field.name === "BM" && (
+                {field.name === 'BM' && (
                   <>
                     <Label className="text-muted-foreground text-xs font-semibold">
                       Módulos
@@ -108,7 +109,7 @@ export function IedList({
                     />
                   </>
                 )}
-                {field.name === "COMM4" && (
+                {field.name === 'COMM4' && (
                   <>
                     <Label className="text-muted-foreground text-xs font-semibold">
                       SPSs conectados
@@ -145,5 +146,5 @@ export function IedList({
         </p>
       )}
     </>
-  );
+  )
 }

@@ -101,9 +101,8 @@ export function Entrada({
       <Label>Protocolo</Label>
 
       <Select
+        onValueChange={value => setValue(`entradas.${index}.protocolo`, value)}
         value={watch(`entradas.${index}.protocolo`)}
-        onValueChange={
-          value => setValue(`entradas.${index}.protocolo`, value)}
       >
         <SelectTrigger className="w-full">
           <SelectValue placeholder="Selecione o protocolo" />
@@ -118,9 +117,8 @@ export function Entrada({
       </Select>
 
       <Select
+        onValueChange={value => setValue(`entradas.${index}.type`, value)}
         value={watch(`entradas.${index}.type`)}
-        onValueChange={value => setValue(`entradas.${index}.type`, value)
-        }
       >
         <SelectTrigger className="w-full">
           <SelectValue placeholder="Selecione o tipo da entrada" />
@@ -262,10 +260,10 @@ export function Entrada({
 
       <Separator />
       <IedSidebar
+        currentIeds={ieds}
         ieds={data?.ied || []}
         ieds_terceiros={data?.ied_terceiros || []}
         onAddIed={appendIed}
-        currentIeds={ieds}
       />
       <IedList
         entradaIndex={index}

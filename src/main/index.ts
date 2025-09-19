@@ -15,16 +15,16 @@ function installGitIfNeeded() {
     let installCommand = ''
 
     if (platform === 'win32') {
-      console.log("Instalando o git no Windows")
-      console.log("winget install --id Git.Git -e --source winget")
+      console.log('Instalando o git no Windows')
+      console.log('winget install --id Git.Git -e --source winget')
       installCommand = 'winget install --id Git.Git -e --source winget'
     } else if (platform === 'darwin') {
-      console.log("Instalando o git no Mac")
-      console.log("brew install git")
+      console.log('Instalando o git no Mac')
+      console.log('brew install git')
       installCommand = 'brew install git'
     } else if (platform === 'linux') {
-      console.log("Instalando o git no linux")
-      console.log("comando usado: sudo apt-get install git -y")
+      console.log('Instalando o git no linux')
+      console.log('comando usado: sudo apt-get install git -y')
       installCommand = 'sudo apt-get install git -y'
     }
 

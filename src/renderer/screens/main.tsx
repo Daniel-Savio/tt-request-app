@@ -1,19 +1,19 @@
-import { Button } from "../components/ui/button";
-import { Calendar } from "../components/ui/calendar";
-import { Label } from "../components/ui/label";
+import { Button } from '../components/ui/button'
+import { Calendar } from '../components/ui/calendar'
+import { Label } from '../components/ui/label'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "../components/ui/popover";
+} from '../components/ui/popover'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../components/ui/select";
-import { Separator } from "../components/ui/separator";
+} from '../components/ui/select'
+import { Separator } from '../components/ui/separator'
 
 import {
   ChevronDownIcon,
@@ -23,44 +23,43 @@ import {
   FolderInput,
   Github,
   Plus,
-} from "lucide-react";
-import { ChangeEvent, useRef, } from "react";
-import { useEffect, useId, useState } from "react";
-import { Entrada } from "../components/Input";
-import { Output } from "../components/Output";
-import { FormProvider, useForm, useFieldArray } from "react-hook-form";
-import { ScrollArea } from "../components/ui/scroll-area";
-import { type RequestForm, requestFormSchema } from "../../shared/types";
-import { toast } from "sonner";
-import { useQuery } from "@tanstack/react-query";
-import { Input } from "../components/ui/input";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate } from "react-router-dom";
-import Tiptap from "renderer/components/TipTap";
-import { error } from "console";
-import { setTimeout } from "timers/promises";
+} from 'lucide-react'
+import { type ChangeEvent, useRef } from 'react'
+import { useEffect, useState } from 'react'
+import { Entrada } from '../components/Input'
+import { Output } from '../components/Output'
+import { FormProvider, useForm, useFieldArray } from 'react-hook-form'
+import { ScrollArea } from '../components/ui/scroll-area'
+import { type RequestForm, requestFormSchema } from '../../shared/types'
+import { toast } from 'sonner'
+import { useQuery } from '@tanstack/react-query'
+import { Input } from '../components/ui/input'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useNavigate } from 'react-router-dom'
+import Tiptap from 'renderer/components/TipTap'
+import { Switch } from '../components/ui/switch'
 
 export function Home() {
-  const navigate = useNavigate();
-  const id = useId();
+  const navigate = useNavigate()
   //Date-Picker
-  const [open, setOpen] = useState(false);
-  const [date, setDate] = useState<Date | undefined>(undefined);
-  const [formStep, setFormStep] = useState(0);
+  const [open, setOpen] = useState(false)
+  const [date, setDate] = useState<Date | undefined>(undefined)
+  const [formStep, setFormStep] = useState(0)
+  const [numbers, setNumbers] = useState(false)
 
   function nextStep() {
-    setFormStep(formStep + 1);
+    setFormStep(formStep + 1)
   }
   function previousStep() {
-    setFormStep(formStep - 1);
+    setFormStep(formStep - 1)
   }
 
   //Use quary
   const { data } = useQuery({
-    queryKey: ["getJsonData"],
+    queryKey: ['getJsonData'],
     queryFn: async () => {
-      const status = await window.App.cloneGitStatus();
-      toast("Notificação", {
+      const status = await window.App.cloneGitStatus()
+      toast('Notificação', {
         description: status.message,
         invert: true,
         richColors: true,
@@ -70,95 +69,95 @@ export function Home() {
         ) : (
           <Github className="text-red-600 size-4" />
         ),
-      });
+      })
 
-      const response = await window.App.getJsonData();
-      return response.data;
+      const response = await window.App.getJsonData()
+      return response.data
     },
-  });
+  })
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleImport = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+    const file = event.target.files?.[0]
     if (file) {
-      const reader = new FileReader();
-      reader.onload = async (e) => {
+      const reader = new FileReader()
+      reader.onload = async e => {
         try {
-          const importedData: RequestForm = JSON.parse(e.target?.result as string);
-          requestForm.reset(importedData);
+          const importedData: RequestForm = JSON.parse(
+            e.target?.result as string
+          )
+          requestForm.reset(importedData)
 
           importedData.entradas?.forEach((entrada, index) => {
-            requestForm.setValue(`entradas.${index}.type`, entrada.type);
-            requestForm.setValue(`entradas.${index}.protocolo`, entrada.protocolo);
-          });
+            requestForm.setValue(`entradas.${index}.type`, entrada.type)
+            requestForm.setValue(
+              `entradas.${index}.protocolo`,
+              entrada.protocolo
+            )
+          })
 
-
-          toast("Sucesso", {
-            description: "Formulário importado com sucesso!",
+          toast('Sucesso', {
+            description: 'Formulário importado com sucesso!',
             invert: true,
             richColors: true,
             duration: 2000,
-          });
+          })
 
-
-
-
-          toast("Revise o formulário:", {
-            description: "Preencha uma nova data",
+          toast('Revise o formulário:', {
+            description: 'Preencha uma nova data',
             invert: true,
             richColors: true,
             icon: <FileWarning className="text-destructive size-4" />,
             duration: 5000,
-          });
-
-          requestForm.setError("processingDate", {
-            type: "manual",
-            message: "Preencha uma nova data",
           })
 
+          requestForm.setError('processingDate', {
+            type: 'manual',
+            message: 'Preencha uma nova data',
+          })
         } catch (error) {
-          toast("Erro", {
-            description: "Arquivo JSON inválido.",
+          toast('Erro', {
+            description: 'Arquivo JSON inválido.',
             invert: true,
             richColors: true,
             duration: 2000,
             icon: <FileWarning className="text-destructive size-4" />,
-          });
-          console.error("Error parsing JSON:", error);
+          })
+          console.error('Error parsing JSON:', error)
         }
-      };
-      reader.readAsText(file);
+      }
+      reader.readAsText(file)
     }
-  };
+  }
 
   const handleExport = () => {
-    const data = requestForm.getValues();
-    const json = JSON.stringify(data, null, 2);
-    const blob = new Blob([json], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "request-form.json";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    toast("Sucesso", {
-      description: "Formulário exportado com sucesso!",
+    const data = requestForm.getValues()
+    const json = JSON.stringify(data, null, 2)
+    const blob = new Blob([json], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'request-form.json'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+    toast('Sucesso', {
+      description: 'Formulário exportado com sucesso!',
       invert: true,
       richColors: true,
       duration: 2000,
-    });
-  };
+    })
+  }
 
   //Formulario
   const requestForm = useForm({
     resolver: zodResolver(requestFormSchema),
     defaultValues: {
-      sigmaConnection: "Com Comunicação",
+      sigmaConnection: 'Com Comunicação',
     },
-  });
+  })
 
   const {
     register,
@@ -167,17 +166,17 @@ export function Home() {
     watch,
     control,
     formState: { errors },
-  } = requestForm;
+  } = requestForm
 
-  const allEntradas = watch("entradas");
+  const allEntradas = watch('entradas')
   const selectedIedsFromInput = Array.from(
     new Map(
       allEntradas
-        ?.flatMap((e) => e.ieds)
+        ?.flatMap(e => e.ieds)
         .filter(Boolean)
         .map((ied: any) => [ied.name, ied])
     ).values()
-  );
+  )
 
   const {
     fields: entradaFields,
@@ -185,8 +184,8 @@ export function Home() {
     remove: removeEntrada,
   } = useFieldArray({
     control,
-    name: "entradas",
-  });
+    name: 'entradas',
+  })
 
   const {
     fields: saidaFields,
@@ -194,37 +193,41 @@ export function Home() {
     remove: removeSaida,
   } = useFieldArray({
     control,
-    name: "saidas",
-  });
+    name: 'saidas',
+  })
 
-  const invoiceNumber = watch("invoiceNumber");
-  const clientNumber = watch("clientNumber");
+  const invoiceNumber = watch('invoiceNumber')
+  const clientNumber = watch('clientNumber')
+  const requester = watch('requester')
+
 
   useEffect(() => {
-    if (invoiceNumber) {
-      setValue("invoiceNumber", invoiceNumber.replace(/\D/g, ""));
+    if (numbers) {
+      setValue('invoiceNumber', '0001')
+      setValue('clientNumber', '0001')
+    } else {
+      setValue('invoiceNumber', '')
+      setValue('clientNumber', '')
     }
-    if (clientNumber) {
-      setValue("clientNumber", clientNumber.replace(/\D/g, ""));
-    }
+  }, [numbers, setValue])
+
+  useEffect(() => {
     if (
       errors.client ||
       errors.clientNumber ||
-      errors.email ||
       errors.invoiceNumber ||
-      errors.processName ||
       errors.project ||
-      errors.salesName ||
+      errors.requester ||
       errors.processingDate
     ) {
-      setFormStep(0);
+      setFormStep(0)
     }
-    if (errors.entradas) setFormStep(1);
-    if (errors.sigmaConnection) setFormStep(2);
-    if (errors.saidas) setFormStep(3);
+    if (errors.entradas) setFormStep(1)
+    if (errors.sigmaConnection) setFormStep(2)
+    if (errors.saidas) setFormStep(3)
 
     if (errors.root) {
-      toast("Erro", {
+      toast('Erro', {
         description: (
           <p className="text-wrap overflow-auto">
             Houve algum erro no preenchimento do formulário
@@ -234,17 +237,16 @@ export function Home() {
         richColors: true,
         duration: 2000,
         icon: <FileWarning className="text-destructive size-4" />,
-      });
+      })
     }
-
-    setValue("sigmaConnection", "Com Comunicação");
-  }, [invoiceNumber, setValue, clientNumber, setValue, errors]);
+    setValue('sigmaConnection', 'Com Comunicação')
+  }, [invoiceNumber, clientNumber, errors, setValue])
 
   //Post form
 
   function postForm(data: RequestForm) {
     if (data.entradas?.length !== 0 && data.saidas?.length === 0) {
-      toast("Erro", {
+      toast('Erro', {
         description: (
           <p className="text-wrap overflow-auto">Inclua ao menos uma saída</p>
         ),
@@ -252,145 +254,140 @@ export function Home() {
         richColors: true,
         duration: 2000,
         icon: <FileWarning className="text-destructive size-4" />,
-      });
-      return;
+      })
+      return
     }
 
-    navigate("/report", { state: { formData: data } });
+    navigate('/report', { state: { formData: data } })
   }
 
   return (
     <div className="flex flex-col items-center justify-center  ">
       <ScrollArea className="w-full h-[900px] p-4 rounded-lg">
-
         <h1 className="text-2xl font-bold mb-4 ">Formulário de Requisição</h1>
         <input
-          type="file"
-          ref={fileInputRef}
-          onChange={handleImport}
           accept=".json"
           className="hidden"
+          onChange={handleImport}
+          ref={fileInputRef}
+          type="file"
         />
         <Button
           className="w-fit p-2"
-          type="button"
           onClick={() => fileInputRef.current?.click()}
-
+          type="button"
         >
           <FolderInput />
           Importar Formulário
         </Button>
 
         <Separator className="my-4"></Separator>
+
         <FormProvider {...requestForm}>
           <form className="" onSubmit={handleSubmit(postForm)}>
-
             <section
-              className={` ${formStep === 0 ? "" : "hidden"
-                } p-2 mb-4 rounded grid grid-cols-1 md:grid-cols-2 gap-4 shadow-md `}
+              className={` ${formStep === 0 ? '' : 'hidden'
+                } p-2 mb-4 rounded flex flex-col gap-4 shadow-md `}
             >
+              {/* //Requerente */}
+              <section className="flex gap-2 justify-between">
+                <div>
+                  <Label className=" text-sm font-medium ">Requerente</Label>
 
+                  <Select
+                    onValueChange={value => {
+                      setValue('requester', value)
+                    }}
+                    value={watch('requester')}
+                  >
+                    <SelectTrigger className="w-96">
+                      <SelectValue placeholder="Quem está fazendo a requisição?" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {data?.requester.map((requester) => {
+                        return (
+                          <SelectItem key={requester.name} value={requester.name}>
+                            {requester.name}
+                          </SelectItem>
+                        )
+                      })}
+                    </SelectContent>
+                  </Select>
 
+                  {errors.requester && (
+                    <p className="mt-2 text-sm text-destructive">
+                      {errors.requester.message}
+                    </p>
+                  )}
+                </div>
 
-              <div>
-                <Label
-                  className=" text-sm font-medium "
-                  htmlFor="responsavelComercial"
-                >
-                  Responsável Comercial
-                </Label>
+                <div className="flex gap-4 items-center">
+                  <div>
+                    <Label className=" text-sm font-medium " htmlFor="email">
+                      Email
+                    </Label>
 
-                <Select
-                  value={watch("salesName")}
-                  onValueChange={(value) => {
-                    setValue("salesName", value);
-                  }}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Jhon Doe" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {data?.comercial.map((comercial) => {
-                      return (
-                        <SelectItem key={comercial} value={comercial}>
-                          {comercial}
-                        </SelectItem>
-                      );
-                    })}
-                  </SelectContent>
-                </Select>
+                    <Input
+                      disabled={!requester}
+                      id={`email`}
+                      type="email"
+                      {...register('email')}
+                      className=""
+                      value={
+                        !requester
+                          ? ''
+                          : (data?.requester.find(
+                            employee => employee.name === requester
+                          )?.email ?? '')
+                      }
+                    />
+                  </div>
 
-                {errors.salesName && (
-                  <p className="mt-2 text-sm text-destructive">
-                    {errors.salesName.message}
-                  </p>
-                )}
-              </div>
-              <div>
-                <Label
-                  className=" text-sm font-medium "
-                  htmlFor="responsavelProcessamento"
-                >
-                  Responsável Processamento
-                </Label>
+                  <hr className="bg-muted-foreground w-10 h-0.5" />
 
-                <Select
-                  value={watch("processName")}
-                  onValueChange={(value) => {
-                    setValue("processName", value);
-                  }}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Jane Doe" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {data?.processamento.map((processamento) => {
-                      return (
-                        <SelectItem key={processamento} value={processamento}>
-                          {processamento}
-                        </SelectItem>
-                      );
-                    })}
-                  </SelectContent>
-                </Select>
+                  <div>
+                    <Label
+                      className=" text-sm font-medium "
+                      htmlFor="departament"
+                    >
+                      Setor
+                    </Label>
 
-                {errors.processName && (
-                  <p className="mt-2 text-sm text-destructive">
-                    {errors.processName.message}
-                  </p>
-                )}
-              </div>
-              <div>
-                <Label className=" text-sm font-medium " htmlFor="email">
-                  E-mail
-                </Label>
-                <Input
-                  id={`${id}-email`}
-                  placeholder="jhondoe@treetech.com.br"
-                  type="email"
-                  {...register("email", {
-                    required: "Campo obrigatório",
-                    pattern: {
-                      value: /\S+@\S+\.\S+/,
-                      message: "E-mail inválido",
-                    },
-                  })}
-                  className=""
-                />
-                {errors.email && (
-                  <p className="mt-2 text-sm text-destructive">
-                    {errors.email.message}
-                  </p>
-                )}
-              </div>
+                    <Input
+                      disabled={!requester}
+                      id={`departament`}
+                      type="text"
+                      {...register('departament')}
+                      value={
+                        !requester
+                          ? ''
+                          : (data?.requester.find(
+                            employee => employee.name === requester
+                          )?.departament ?? '')
+                      }
+                    />
+                  </div>
+                  {errors.email && (
+                    <p className="mt-2 text-sm text-destructive">
+                      {errors.email.message}
+                    </p>
+                  )}
+                  {errors.departament && (
+                    <p className="mt-2 text-sm text-destructive">
+                      {errors.departament.message}
+                    </p>
+                  )}
+                </div>
+              </section>
+
               <div>
                 <Label className=" text-sm font-medium " htmlFor="client">
-                  Cliente
+                  Cliente ou Fábrica
                 </Label>
                 <Input
-                  id={`${id}-client`}
-                  placeholder="PSI"
-                  {...register("client")}
+                  id={`client`}
+                  placeholder="Para quem vai ser enviada?"
+                  {...register('client')}
                   className=""
                 />
                 {errors.client && (
@@ -404,9 +401,9 @@ export function Home() {
                   Projeto
                 </Label>
                 <Input
-                  id={`${id}-projeto`}
-                  placeholder="ISA ENERGIA"
-                  {...register("project")}
+                  id={`projeto`}
+                  placeholder="Pertence a qual projeto?"
+                  {...register('project')}
                   className=""
                 />
                 {errors.project && (
@@ -415,40 +412,64 @@ export function Home() {
                   </p>
                 )}
               </div>
-              <div>
-                <Label className=" text-sm font-medium " htmlFor="numeroPedido">
-                  Nº Pedido
-                </Label>
-                <Input
-                  id={`${id}-numeroPedido`}
-                  placeholder="54321"
-                  type="text"
-                  {...register("invoiceNumber")}
-                  className=""
-                />
-                {errors.invoiceNumber && (
-                  <p className="mt-2 text-sm text-destructive">
-                    {errors.invoiceNumber.message}
-                  </p>
-                )}
-              </div>
-              <div>
-                <Label className=" text-sm font-medium " htmlFor="clientNumber">
-                  Nº Cliente
-                </Label>
-                <Input
-                  id={`${id}-clientNumber`}
-                  placeholder="12345"
-                  type="text"
-                  {...register("clientNumber")}
-                  className=""
-                />
-                {errors.clientNumber && (
-                  <p className="mt-2 text-sm text-destructive">
-                    {errors.clientNumber.message}
-                  </p>
-                )}
-              </div>
+              <section className="space-y-4">
+                <span>
+                  <h3 className="text-md font-bold">
+                    Tem o número do pedido e do cliente?
+                  </h3>
+                  <span className="flex gap-2 items-center my-2">
+                    <p>Sim</p>{' '}
+                    <Switch
+                      id={`airplane-mode`}
+                      onCheckedChange={setNumbers}
+                    />
+                    <p>Não</p>
+                  </span>
+                </span>
+                <div className="ml-4">
+                  <Label
+                    className=" text-sm font-medium "
+                    htmlFor="numeroPedido"
+                  >
+                    Nº Pedido
+                  </Label>
+                  <Input
+                    id={`numeroPedido`}
+                    placeholder="54321"
+                    type="number"
+                    {...register('invoiceNumber')}
+                    className=""
+                    disabled={numbers}
+                  />
+                  {errors.invoiceNumber && (
+                    <p className="mt-2 text-sm text-destructive">
+                      {errors.invoiceNumber.message}
+                    </p>
+                  )}
+                </div>
+                <div className="ml-4">
+                  <Label
+                    className=" text-sm font-medium "
+                    htmlFor="clientNumber"
+                  >
+                    Nº Cliente
+                  </Label>
+                  <Input
+
+                    id={`clientNumber`}
+                    placeholder="12345"
+                    type="number"
+                    {...register('clientNumber')}
+                    className=""
+                    disabled={numbers}
+                  />
+                  {errors.clientNumber && (
+                    <p className="mt-2 text-sm text-destructive">
+                      {errors.clientNumber.message}
+                    </p>
+                  )}
+                </div>
+              </section>
               <div>
                 <Label className="px-1 w-full" htmlFor="date">
                   Data de envio ao processamento
@@ -457,10 +478,10 @@ export function Home() {
                   <PopoverTrigger asChild>
                     <Button
                       className="w-full mt-1 justify-between font-normal"
-                      id={`${id}-date`}
+                      id={`date`}
                       variant="outline"
                     >
-                      {date ? date.toLocaleDateString() : "Escolha a data"}
+                      {date ? date.toLocaleDateString() : 'Escolha a data'}
                       <ChevronDownIcon />
                     </Button>
                   </PopoverTrigger>
@@ -471,10 +492,10 @@ export function Home() {
                     <Calendar
                       captionLayout="dropdown"
                       mode="single"
-                      onSelect={(date) => {
-                        setDate(date);
+                      onSelect={date => {
+                        setDate(date)
                         if (date) {
-                          setValue("processingDate", date);
+                          setValue('processingDate', date)
                         }
                       }}
                       selected={date}
@@ -491,27 +512,27 @@ export function Home() {
 
             {/* STEP 2 */}
             <section
-              className={` ${formStep === 1 ? "" : "hidden"
+              className={` ${formStep === 1 ? '' : 'hidden'
                 }  p-2 mb-4 rounded gap-4 shadow-md `}
             >
               <div>
                 <Label className=" text-sm font-medium ">Gateway</Label>
                 <Select
-                  value={watch("gateway")}
-                  onValueChange={(value) => {
-                    setValue("gateway", value);
+                  onValueChange={value => {
+                    setValue('gateway', value)
                   }}
+                  value={watch('gateway')}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Selecione um IED" />
                   </SelectTrigger>
                   <SelectContent>
-                    {data?.sd.map((sd) => {
+                    {data?.sd.map(sd => {
                       return (
                         <SelectItem key={sd} value={sd}>
                           {sd}
                         </SelectItem>
-                      );
+                      )
                     })}
                   </SelectContent>
                 </Select>
@@ -519,17 +540,17 @@ export function Home() {
 
               <ScrollArea className="max-h-900 mt-4 w-full">
                 <h1 className="text-lg font-bold">
-                  Entradas{" "}
+                  Entradas{' '}
                   <Button
                     className="mt-2 border  size-6 "
                     onClick={() =>
                       appendEntrada({
-                        type: "",
-                        protocolo: "",
-                        baudRate: "9600",
-                        dataBits: "8",
-                        parity: "None",
-                        stopBits: "1",
+                        type: '',
+                        protocolo: '',
+                        baudRate: '9600',
+                        dataBits: '8',
+                        parity: 'None',
+                        stopBits: '1',
                         ieds: [],
                       })
                     }
@@ -558,7 +579,7 @@ export function Home() {
 
             {/* STEP 3 */}
             <section
-              className={` ${formStep === 2 ? "" : "hidden"
+              className={` ${formStep === 2 ? '' : 'hidden'
                 }  p-2 mb-4 rounded gap-4 shadow-md `}
             >
               <div>
@@ -570,23 +591,23 @@ export function Home() {
                 </Label>
 
                 <Select
-                  value={watch("sigmaConnection")}
                   defaultValue="Com Comunicação"
-                  onValueChange={(value) => {
-                    setValue("sigmaConnection", value);
+                  onValueChange={value => {
+                    setValue('sigmaConnection', value)
                   }}
+                  value={watch('sigmaConnection')}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Tipo da comunicação" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem key={1} value={"Sem Comunicação"}>
+                    <SelectItem key={1} value={'Sem Comunicação'}>
                       Sem Comunicação
                     </SelectItem>
-                    <SelectItem key={2} value={"Com Comunicação"}>
+                    <SelectItem key={2} value={'Com Comunicação'}>
                       Com Comunicação
                     </SelectItem>
-                    <SelectItem key={3} value={"SigmaSync"}>
+                    <SelectItem key={3} value={'SigmaSync'}>
                       Sigma Sync
                     </SelectItem>
                   </SelectContent>
@@ -602,25 +623,25 @@ export function Home() {
 
             {/* STEP 4 */}
             <section
-              className={` ${formStep === 3 ? "" : "hidden"
+              className={` ${formStep === 3 ? '' : 'hidden'
                 }  p-2 mb-4 rounded gap-4 shadow-md `}
             >
               <ScrollArea className="max-h-900 mt-4 w-full">
                 <h1 className="text-lg font-bold">
-                  Saídas{" "}
+                  Saídas{' '}
                   <Button
                     className="mt-2 border  size-6 "
                     onClick={() => {
-                      const firstInput = requestForm.getValues("entradas.0");
+                      const firstInput = requestForm.getValues('entradas.0')
                       appendSaida({
-                        type: "TCP/IP",
+                        type: 'TCP/IP',
                         protocolo: firstInput?.protocolo,
                         ieds: firstInput?.ieds,
-                        baudRate: "9600",
-                        dataBits: "8",
-                        parity: "None",
-                        stopBits: "1",
-                      });
+                        baudRate: '9600',
+                        dataBits: '8',
+                        parity: 'None',
+                        stopBits: '1',
+                      })
                     }}
                     type="button"
                     variant="ghost"
@@ -652,7 +673,7 @@ export function Home() {
                 disabled={formStep === 0}
                 onClick={previousStep}
                 type="button"
-                variant={"secondary"}
+                variant={'secondary'}
               >
                 <ChevronLeft />
                 Anterior
@@ -664,7 +685,7 @@ export function Home() {
                 disabled={formStep === 3}
                 onClick={nextStep}
                 type="button"
-                variant={"secondary"}
+                variant={'secondary'}
               >
                 Próximo
                 <ChevronRight />
@@ -673,18 +694,18 @@ export function Home() {
             </div>
 
             <div
-              className={`  mt-8 md:col-span-2 space-y-4  justify-end ${formStep === 3 ? "" : "hidden"
+              className={`  mt-8 md:col-span-2 space-y-4  justify-end ${formStep === 3 ? '' : 'hidden'
                 }`}
             >
               <Button className="w-full" type="submit">
-                Enviar
+                Revisar PDF
               </Button>
 
               <Button
+                className="w-full mr-2"
+                onClick={handleExport}
                 type="button"
                 variant="outline"
-                onClick={handleExport}
-                className="w-full mr-2"
               >
                 Exportar Template
               </Button>
@@ -698,9 +719,7 @@ export function Home() {
         </FormProvider>
 
 
-
-
       </ScrollArea>
     </div>
-  );
+  )
 }
