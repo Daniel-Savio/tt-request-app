@@ -38,6 +38,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate } from 'react-router-dom'
 import Tiptap from 'renderer/components/TipTap'
 import { Switch } from '../components/ui/switch'
+import { set } from 'zod'
+import { de } from 'date-fns/locale'
 
 export function Home() {
   const navigate = useNavigate()
@@ -199,6 +201,8 @@ export function Home() {
   const invoiceNumber = watch('invoiceNumber')
   const clientNumber = watch('clientNumber')
   const requester = watch('requester')
+  const email = watch('email')
+  const departament = watch('departament')
 
 
   useEffect(() => {
@@ -218,7 +222,9 @@ export function Home() {
       errors.invoiceNumber ||
       errors.project ||
       errors.requester ||
-      errors.processingDate
+      errors.processingDate ||
+      errors.email ||
+      errors.departament
     ) {
       setFormStep(0)
     }
@@ -240,7 +246,7 @@ export function Home() {
       })
     }
     setValue('sigmaConnection', 'Com Comunicação')
-  }, [invoiceNumber, clientNumber, errors, setValue])
+  }, [invoiceNumber, clientNumber, errors, setValue, email, departament, requester])
 
   //Post form
 
@@ -257,6 +263,21 @@ export function Home() {
       })
       return
     }
+
+    if (data.entradas?.length === 0) {
+      toast('Erro', {
+        description: (
+          <p className="text-wrap overflow-auto">Inclua ao menos uma entrada</p>
+        ),
+        invert: true,
+        richColors: true,
+        duration: 2000,
+        icon: <FileWarning className="text-destructive size-4" />,
+      })
+      setFormStep(1)
+      return
+    }
+
 
     navigate('/report', { state: { formData: data } })
   }
@@ -328,9 +349,10 @@ export function Home() {
                     </Label>
 
                     <Input
-                      disabled={!requester}
+                      disabled={true}
                       id={`email`}
                       type="email"
+                      defaultValue={email}
                       {...register('email')}
                       className=""
                       value={
@@ -354,9 +376,10 @@ export function Home() {
                     </Label>
 
                     <Input
-                      disabled={!requester}
+                      disabled={true}
                       id={`departament`}
                       type="text"
+                      defaultValue={departament}
                       {...register('departament')}
                       value={
                         !requester
@@ -539,7 +562,7 @@ export function Home() {
               </div>
 
               <ScrollArea className="max-h-900 mt-4 w-full">
-                <h1 className="text-lg font-bold">
+                <h1 className="text-lg font-bold ">
                   Entradas{' '}
                   <Button
                     className="mt-2 border  size-6 "
@@ -555,9 +578,9 @@ export function Home() {
                       })
                     }
                     type="button"
-                    variant="ghost"
+                    variant="default"
                   >
-                    <Plus className="text-primary" />
+                    <Plus className="" />
                   </Button>
                 </h1>
                 {errors.entradas && (
@@ -644,9 +667,9 @@ export function Home() {
                       })
                     }}
                     type="button"
-                    variant="ghost"
+                    variant="default"
                   >
-                    <Plus className="text-primary" />
+                    <Plus className="" />
                   </Button>
                 </h1>
 

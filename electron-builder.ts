@@ -47,6 +47,6 @@ export default {
   win: {
     artifactName,
     icon: `${resources}/build/icons/icon.ico`,
-    target: ['zip', 'portable'],
+    target: [{ target: 'nsis', arch: ['x64'] }],
   },
 } satisfies Configuration

@@ -12,6 +12,7 @@ export const IPC = {
   GITSTATUS: {
     PULL: 'git-status: pull',
     CLONE: 'git-status: clone',
+    FETCH: 'git-status: fetch',
   },
   JSON: {
     FETCH: 'app-data: fetch',

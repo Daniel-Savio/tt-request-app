@@ -2,7 +2,7 @@
   "displayName": "Request App",
   "name": "tt-request-app",
   "description": "App para montar uma requisição de SDG/SD+ para a Treetech",
-  "version": "1.1.0",
+  "version": "1.2.1",
   "main": "./node_modules/.dev/main/index.js",
   "resources": "src/resources",
   "author": {
@@ -32,6 +32,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
+    "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-label": "^2.1.7",
     "@radix-ui/react-popover": "^1.1.15",

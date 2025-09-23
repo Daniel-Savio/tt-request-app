@@ -25,10 +25,11 @@ ipcMain.handle(IPC.GITSTATUS.CLONE, async (): Promise<StatusResponse> => {
 ipcMain.handle(IPC.JSON.FETCH, async (): Promise<AppData> => {
   try {
     const jsonData = await getJsonData()
-    console.log(jsonData)
+    //console.log(jsonData)
     return { isSuccess: true, data: jsonData }
   } catch (e: any) {
-    console.log('dsd')
+    console.log('Erro ao buscar dados do JSON:', e.message)
     return { isSuccess: false, data: await getJsonData() }
   }
 })
+
