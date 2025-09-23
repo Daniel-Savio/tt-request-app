@@ -188,7 +188,7 @@ export function Report() {
                     IP do {formData.gateway}: {saida.ip}
                   </p>
                   <Separator className="" orientation="vertical" />
-                  <p>Porta de comunicação: {saida.port}</p>
+                  <p>Porta de comunicação: {saida.port ? saida.port : 'Padrão do protocolo'}</p>
                 </div>
               )}
 

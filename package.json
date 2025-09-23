@@ -2,7 +2,7 @@
   "displayName": "Request App",
   "name": "tt-request-app",
   "description": "App para montar uma requisição de SDG/SD+ para a Treetech",
-  "version": "1.2.1",
+  "version": "1.2.3",
   "main": "./node_modules/.dev/main/index.js",
   "resources": "src/resources",
   "author": {

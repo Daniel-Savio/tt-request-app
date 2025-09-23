@@ -96,7 +96,7 @@ export function Output({
     if (protocolo === 'IEC61850') return '102'
   }
 
-  useEffect(() => {}, [protocolo, selectedIedsFromInput])
+  useEffect(() => { }, [protocolo, selectedIedsFromInput])
 
   const { append: appendIed, remove: removeIed } = useFieldArray({
     control,
@@ -176,7 +176,7 @@ export function Output({
                 Parâmetros de rede Ethernet
                 <br />
                 <br />
-                IP do SD a ser lido (Padrão)
+                IP do SD a ser lido - Este IP deve ser fornecido pelo CLIENTE. Caso contrário, será deixado o IP padrão do Gateway
                 <br />
                 Porta TCP da comunicação (padrão por protocolo)
               </pre>

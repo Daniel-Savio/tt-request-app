@@ -39,7 +39,7 @@ import { useNavigate } from 'react-router-dom'
 import Tiptap from 'renderer/components/TipTap'
 import { Switch } from '../components/ui/switch'
 import { set } from 'zod'
-import { de } from 'date-fns/locale'
+import { de, se } from 'date-fns/locale'
 
 export function Home() {
   const navigate = useNavigate()
@@ -204,6 +204,18 @@ export function Home() {
   const email = watch('email')
   const departament = watch('departament')
 
+  useEffect(() => {
+    if (requester) {
+      const employee = data?.requester.find(emp => emp.name === requester)
+      if (employee) {
+        setValue('email', employee.email)
+        setValue('departament', employee.departament)
+      } else {
+        setValue('email', '')
+        setValue('departament', '')
+      }
+    }
+  }, [requester, data, setValue])
 
   useEffect(() => {
     if (numbers) {
@@ -229,6 +241,7 @@ export function Home() {
       setFormStep(0)
     }
     if (errors.entradas) setFormStep(1)
+    if (errors.gateway) setFormStep(1)
     if (errors.sigmaConnection) setFormStep(2)
     if (errors.saidas) setFormStep(3)
 
@@ -251,6 +264,7 @@ export function Home() {
   //Post form
 
   function postForm(data: RequestForm) {
+    let formComplete = true
     if (data.entradas?.length !== 0 && data.saidas?.length === 0) {
       toast('Erro', {
         description: (
@@ -278,8 +292,78 @@ export function Home() {
       return
     }
 
+    data.entradas?.forEach((entrada, index) => {
+      if (!entrada.ieds || entrada.ieds.length === 0) {
+        formComplete = false
+        toast('Entrada Vazia', {
+          description: (
+            <p className="text-wrap overflow-auto">{`Inclua ao menos um IED na entrada: ${index + 1}`}</p>
+          ),
+          invert: true,
+          richColors: true,
+          duration: 2000,
+          icon: <FileWarning className="text-destructive size-4" />,
+        })
+      }
+      setFormStep(1)
+      return
+    })
 
-    navigate('/report', { state: { formData: data } })
+    //Checagem das saídas
+    data.saidas?.forEach((saida, index) => {
+      if (!saida.ieds || saida.ieds.length === 0) {
+        formComplete = false
+        toast('Saída Vazia', {
+          description: (
+            <p className="text-wrap overflow-auto">{`Inclua ao menos um IED na saída: ${index + 1}`}</p>
+          ),
+          invert: true,
+          richColors: true,
+          duration: 2000,
+          icon: <FileWarning className="text-destructive size-4" />,
+        })
+      }
+      return
+    })
+
+    data.entradas?.forEach((entrada, index) => {
+      if (entrada.protocolo === "" || entrada.type === "") {
+        formComplete = false
+        toast(`Entrada: ${index + 1}`, {
+          description: (
+            <p className="text-wrap overflow-auto">{`Confira os parâmetros na entrada: ${index + 1}`}</p>
+          ),
+          invert: true,
+          richColors: true,
+          duration: 2000,
+          icon: <FileWarning className="text-destructive size-4" />,
+        })
+      }
+      setFormStep(1)
+      return
+    })
+
+    data.saidas?.forEach((saida, index) => {
+      if (saida.protocolo === "" || saida.type === "") {
+        formComplete = false
+        toast(`Entrada: ${index + 1}`, {
+          description: (
+            <p className="text-wrap overflow-auto">{`Confira os parâmetros na saída: ${index + 1}`}</p>
+          ),
+          invert: true,
+          richColors: true,
+          duration: 2000,
+          icon: <FileWarning className="text-destructive size-4" />,
+        })
+      }
+
+      return
+    })
+
+
+    setFormStep(3)
+
+    if (formComplete) navigate('/report', { state: { formData: data } })
   }
 
   return (
@@ -352,16 +436,8 @@ export function Home() {
                       disabled={true}
                       id={`email`}
                       type="email"
-                      defaultValue={email}
                       {...register('email')}
                       className=""
-                      value={
-                        !requester
-                          ? ''
-                          : (data?.requester.find(
-                            employee => employee.name === requester
-                          )?.email ?? '')
-                      }
                     />
                   </div>
 
@@ -379,15 +455,7 @@ export function Home() {
                       disabled={true}
                       id={`departament`}
                       type="text"
-                      defaultValue={departament}
                       {...register('departament')}
-                      value={
-                        !requester
-                          ? ''
-                          : (data?.requester.find(
-                            employee => employee.name === requester
-                          )?.departament ?? '')
-                      }
                     />
                   </div>
                   {errors.email && (
@@ -559,6 +627,9 @@ export function Home() {
                     })}
                   </SelectContent>
                 </Select>
+                {errors.gateway && (
+                  <p className="mt-2 text-sm text-destructive">
+                    {errors.gateway.message} </p>)}
               </div>
 
               <ScrollArea className="max-h-900 mt-4 w-full">
@@ -695,6 +766,7 @@ export function Home() {
               <Button
                 disabled={formStep === 0}
                 onClick={previousStep}
+                className={` ${formStep === 0 ? 'invisible' : ''}`}
                 type="button"
                 variant={'secondary'}
               >
@@ -705,10 +777,10 @@ export function Home() {
                 {formStep + 1}/4
               </span>
               <Button
-                disabled={formStep === 3}
                 onClick={nextStep}
                 type="button"
                 variant={'secondary'}
+                className={` ${formStep === 3 ? 'invisible' : ''}`}
               >
                 Próximo
                 <ChevronRight />
